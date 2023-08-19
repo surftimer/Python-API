@@ -55,8 +55,13 @@ class ResponseInsertQuery:
         """Makes it readable for `print()`"""
         return {"inserted": self.inserted, "execution": self.execution}
 
-
-app = FastAPI()
+# Swagger UI configuration
+swagger_config = {
+    "displayOperationId": False,  # Show operationId on the UI
+    "defaultModelsExpandDepth": -1,  # The default expansion depth for models (set to -1 completely hide the models)
+    "deepLinking": True,  # Enables deep linking for tags and operations
+}
+app = FastAPI(title="SurfTimer API", description="by [`tslashd`](https://github.com/tslashd)", version="0.0.0", debug=False, swagger_ui_parameters=swagger_config)
 
 
 @app.middleware("http")
