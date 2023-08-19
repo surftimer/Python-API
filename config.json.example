@@ -1,0 +1,20 @@
+{
+  "AUTH0": {
+    "DOMAIN": "",
+    "API_AUDIENCE": "",
+    "ALGORITHMS": "",
+    "ISSUER": ""
+  },
+
+  "DATABASE": {
+    "USERNAME": "",
+    "PASSWORD": "",
+    "HOST": "",
+    "DB": ""
+  },
+
+  "WHITELISTED_IPS": [
+    "127.0.0.1",
+    "",
+  ]
+}

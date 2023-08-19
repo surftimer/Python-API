@@ -1,0 +1,8 @@
+__pycache__
+.vscode
+venv
+requests.json
+denied.json
+config.json
+auth_test.py
+start.sh
