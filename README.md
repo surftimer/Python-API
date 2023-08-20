@@ -7,11 +7,6 @@ SurfTimer FastAPI
     - Create a `denied.json` file with `[]` inside
 
 
-
-
-"""Containing all SurfTimer queries from `queries.sp`"""
-
-
 ### To Do
 - [ ] ck_announcements
 - [ ] ck_bonus
@@ -29,4 +24,3 @@ SurfTimer FastAPI
 - [ ] ck_prinfo
 - [ ] ck_replays
 - [ ] check tables data type
-
