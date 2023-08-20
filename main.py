@@ -92,7 +92,9 @@ def home():
 
 
 # SurfTimer-Mapchooser queries
-@app.get("/surftimer/mapchooser", name="Mapchooser & Nominations & RTV", tags=["Mapchooser"])
+@app.get(
+    "/surftimer/mapchooser", name="Mapchooser & Nominations & RTV", tags=["Mapchooser"]
+)
 def mapchooser(
     request: Request,
     type: int,
@@ -224,9 +226,9 @@ def mapchooser(
 def selectLatestRecord(request: Request, response: Response):
     """Retrieves the last 50 records\n
     ```char sql_selectLatestRecords[] = ....```"""
-    append_request_log(request)
-
     tic = time.perf_counter()
+
+    append_request_log(request)
 
     xquery = selectQuery(surftimer.queries.sql_selectLatestRecords)
 
@@ -244,7 +246,7 @@ def selectLatestRecord(request: Request, response: Response):
 def insertLatestRecord(
     request: Request,
     response: Response,
-    steamid: str,
+    steamid32: str,
     name: str,
     runtime: float,
     mapname: str,
@@ -255,7 +257,7 @@ def insertLatestRecord(
     append_request_log(request)
 
     sql = surftimer.queries.sql_insertLatestRecords.format(
-        steamid, name, runtime, mapname
+        steamid32, name, runtime, mapname
     )
     # xquery = insertQuery(sql)
     xquery = 0
@@ -404,14 +406,14 @@ def updateMapperName(
     name="Insert Player Options",
     tags=["SurfTimer", "ck_playeroptions2"],
 )
-def insertPlayerOptions(request: Request, response: Response, steamid: str):
+def insertPlayerOptions(request: Request, response: Response, steamid32: str):
     """```c
     char[] sql_insertPlayerOptions = ....
     ```"""
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = insertQuery(surftimer.queries.sql_insertPlayerOptions.format(steamid))
+    xquery = insertQuery(surftimer.queries.sql_insertPlayerOptions.format(steamid32))
 
     if xquery < 1:
         JSONResponse(
@@ -494,7 +496,7 @@ def updatePlayerOptions(
     csd_g: int,
     csd_b: int,
     prespeedmode: int,
-    steamid: str,
+    steamid32: str,
 ):
     """```c
     char[] sql_updatePlayerOptions = ....
@@ -539,7 +541,7 @@ def updatePlayerOptions(
             csd_g,
             csd_b,
             prespeedmode,
-            steamid,
+            steamid32,
         )
     )
 
@@ -555,6 +557,469 @@ def updatePlayerOptions(
     # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+# ck_playerrank
+@app.post(
+    "surftimer/insertPlayerRank",
+    name="Add Player Rank",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def insertPlayerRank(
+    request: Request,
+    response: Response,
+    steamid32,
+    steamid64,
+    name,
+    country,
+    countryCode,
+    continentCode,
+    joined,
+    style,
+):
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = surftimer.queries.sql_insertPlayerRank.format(
+        steamid32,
+        steamid64,
+        name,
+        country,
+        countryCode,
+        continentCode,
+        joined,
+        style,
+    )
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.post(
+    "surftimer/updatePlayerRankPoints",
+    name="Update Player Rank Points 1",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def updatePlayerRankPoints(
+    request: Request,
+    response: Response,
+    name: str,
+    points: str,
+    wrpoints: int,
+    wrbpoints: int,
+    wrcppoints: int,
+    top10points: int,
+    groupspoints: int,
+    mappoints: int,
+    bonuspoints: int,
+    finishedmapspro: str,
+    finishedbonuses: int,
+    finishedstages: int,
+    wrs: int,
+    wrbs: int,
+    wrcps: int,
+    top10s: int,
+    groups: int,
+    steamid32: str,
+    style: int,
+):
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = surftimer.queries.sql_updatePlayerRankPoints.format(
+        name,
+        points,
+        wrpoints,
+        wrbpoints,
+        wrcppoints,
+        top10points,
+        groupspoints,
+        mappoints,
+        bonuspoints,
+        finishedmapspro,
+        finishedbonuses,
+        finishedstages,
+        wrs,
+        wrbs,
+        wrcps,
+        top10s,
+        groups,
+        steamid32,
+        style,
+    )
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.post(
+    "surftimer/updatePlayerRankPoints2",
+    name="Update Player Rank Points 2",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def updatePlayerRankPoints2(
+    request: Request,
+    response: Response,
+    name: str,
+    points: str,
+    wrpoints: int,
+    wrbpoints: int,
+    wrcppoints: int,
+    top10points: int,
+    groupspoints: int,
+    mappoints: int,
+    bonuspoints: int,
+    finishedmapspro: str,
+    finishedbonuses: int,
+    finishedstages: int,
+    wrs: int,
+    wrbs: int,
+    wrcps: int,
+    top10s: int,
+    groups: int,
+    country: str,
+    countryCode: str,
+    continentCode: str,
+    steamid32: str,
+    style: int,
+):
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = surftimer.queries.sql_updatePlayerRankPoints2.format(
+        name,
+        points,
+        wrpoints,
+        wrbpoints,
+        wrcppoints,
+        top10points,
+        groupspoints,
+        mappoints,
+        bonuspoints,
+        finishedmapspro,
+        finishedbonuses,
+        finishedstages,
+        wrs,
+        wrbs,
+        wrcps,
+        top10s,
+        groups,
+        country,
+        countryCode,
+        continentCode,
+        steamid32,
+        style,
+    )
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.post(
+    "surftimer/updatePlayerRank",
+    name="Update Player Rank Points 2",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def updatePlayerRank(
+    request: Request,
+    response: Response,
+    finishedmaps: str,
+    finishedmapspro: str,
+    steamid32: str,
+    style: str,
+):
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = surftimer.queries.sql_updatePlayerRank.format(
+        finishedmaps,
+        finishedmapspro,
+        steamid32,
+        style,
+    )
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.get(
+    "/surftimer/selectPlayerName",
+    name="Select Player Name",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def selectPlayerName(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """`char[] sql_selectPlayerName = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_selectPlayerName.format(steamid32))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"steamid32": steamid32}
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    xquery["xtime"] = time.perf_counter() - tic
+    return xquery
+
+
+@app.post(
+    "surftimer/updateLastSeenMySQL",
+    name="Update Last Seen",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def updateLastSeen(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.get(
+    "/surftimer/selectTopPlayers",
+    name="Select Top Players",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def selectTopPlayers(
+    request: Request,
+    response: Response,
+    style: int,
+):
+    """`char[] sql_selectTopPlayers = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_selectTopPlayers.format(style))
+
+    if xquery:
+        xquery = xquery
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"style": style}
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    # xquery["xtime"] = time.perf_counter() - tic
+    return xquery
+
+
+@app.get(
+    "/surftimer/selectRankedPlayersRank",
+    name="Select Ranked Players Rank",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def selectRankedPlayersRank(
+    request: Request,
+    response: Response,
+    style: int,
+    steamid32: str,
+):
+    """`char[] sql_selectRankedPlayersRank = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(
+        surftimer.queries.sql_selectRankedPlayersRank.format(style, steamid32, style)
+    )
+    print(surftimer.queries.sql_selectRankedPlayersRank.format(style, steamid32, style))
+
+    if xquery:
+        xquery = xquery
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"steamid32": steamid32}
+        xquery["xtime"] = time.perf_counter() - tic
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@app.get(
+    "/surftimer/selectRankedPlayers",
+    name="Select Ranked Players",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def selectRankedPlayers(request: Request, response: Response):
+    """`char[] sql_selectRankedPlayers = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_selectRankedPlayers)
+    # xquery = []
+
+    if len(xquery) > 0:
+        xquery = xquery
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {}
+        xquery["xtime"] = time.perf_counter() - tic
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@app.get(
+    "/surftimer/countRankedPlayers",
+    name="Count Ranked Players",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def countRankedPlayers(
+    request: Request,
+    response: Response,
+    style: int,
+):
+    """This is technically not ***Ranked*** players, it's all `steamid` count in `ck_playerrank`\n
+    `char[] sql_CountRankedPlayers = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_CountRankedPlayers.format(style))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"style": style}
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    xquery["xtime"] = time.perf_counter() - tic
+    return xquery
+
+
+@app.get(
+    "/surftimer/countRankedPlayers2",
+    name="Count Ranked Players 2",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def countRankedPlayers2(
+    request: Request,
+    response: Response,
+    style: int,
+):
+    """This ***DOES*** check for player points being higher than 0\n
+    `char[] sql_CountRankedPlayers2 = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_CountRankedPlayers2.format(style))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"style": style}
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    xquery["xtime"] = time.perf_counter() - tic
+    return xquery
+
+
+@app.get(
+    "/surftimer/selectPlayerProfile",
+    name="Select Player Profile",
+    tags=["SurfTimer", "ck_playerrank"],
+)
+def selectPlayerProfile(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    style: int,
+):
+    """`char[] sql_selectPlayerProfile = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(
+        surftimer.queries.sql_selectPlayerProfile.format(steamid32, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"steamid32": steamid32}
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    xquery["xtime"] = time.perf_counter() - tic
+    return xquery
 
 
 # new code 👇

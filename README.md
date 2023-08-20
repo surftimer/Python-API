@@ -14,7 +14,7 @@ SurfTimer FastAPI
 - [x] ck_latestrecords
 - [x] ck_maptier
 - [x] ck_playeroptions2
-- [ ] ck_playerrank
+- [x] ck_playerrank
 - [ ] ck_playertemp
 - [ ] ck_playertimes
 - [ ] ck_spawnlocations
