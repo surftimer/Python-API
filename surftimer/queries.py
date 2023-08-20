@@ -21,7 +21,6 @@ sql_selectTopBonusSurfers = "SELECT db2.steamid, db1.name, db2.runtime as overal
 
 ## ck_checkpoints
 sql_createCheckpoints = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;"
-##sql_updateCheckpoints = "UPDATE ck_checkpoints SET time='{}', stage_time='{}', stage_attempts='{}' WHERE steamid='{}' AND mapname='{}' AND cp ='{}' AND zonegroup='{}';";
 sql_InsertOrUpdateCheckpoints = "INSERT INTO ck_checkpoints (steamid, mapname, cp, time, stage_time, stage_attempts, zonegroup) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}') ON DUPLICATE KEY UPDATE time='{}', stage_time='{}', stage_attempts='{}';"
 sql_selectCheckpoints = "SELECT zonegroup, cp, time FROM ck_checkpoints WHERE mapname='{}' AND steamid = '{}';"
 sql_selectCheckpointsinZoneGroup = "SELECT cp, time FROM ck_checkpoints WHERE mapname='{}' AND steamid = '{}' AND zonegroup = {};"
