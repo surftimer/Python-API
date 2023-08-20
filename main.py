@@ -2,7 +2,7 @@
 from datetime import datetime
 import json, time
 from fastapi import FastAPI, Request, status, Depends, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from threading import Thread  # Not used yet
 
 
@@ -47,21 +47,28 @@ def append_request_log(request: Request):
 class ResponseInsertQuery:
     """This is to be used for all `INSERT` queries if possible"""
 
-    def __init__(self, inserted, execution):
+    def __init__(self, inserted):
         self.inserted = inserted
-        self.execution = execution
 
     def to_dict(self):
         """Makes it readable for `print()`"""
-        return {"inserted": self.inserted, "execution": self.execution}
+        return {"inserted": self.inserted}
+
 
 # Swagger UI configuration
 swagger_config = {
     "displayOperationId": False,  # Show operationId on the UI
     "defaultModelsExpandDepth": -1,  # The default expansion depth for models (set to -1 completely hide the models)
     "deepLinking": True,  # Enables deep linking for tags and operations
+    "useUnsafeMarkdown": True,
 }
-app = FastAPI(title="SurfTimer API", description="by [`tslashd`](https://github.com/tslashd)", version="0.0.0", debug=False, swagger_ui_parameters=swagger_config)
+app = FastAPI(
+    title="SurfTimer API",
+    description="""by [`tslashd`](https://github.com/tslashd)""",
+    version="0.0.0",
+    debug=False,
+    swagger_ui_parameters=swagger_config,
+)
 
 
 @app.middleware("http")
@@ -85,7 +92,7 @@ def home():
 
 
 # SurfTimer-Mapchooser queries
-@app.get("/surftimer/mapchooser")
+@app.get("/surftimer/mapchooser", name="Mapchooser & Nominations & RTV", tags=["Mapchooser"])
 def mapchooser(
     request: Request,
     type: int,
@@ -96,6 +103,16 @@ def mapchooser(
     steamid: str = None,
     style: int = None,
 ):
+    """All queries for `st-mapchooser, st-rtv, st-nominations` are contained here with types for the different ones.\n
+    Above mentioned plugins need to be reworked to use API Calls, below is actual improvement from this implementation:\n
+    ```fix
+    Old (1220 maps):
+    ===== [Nominations] BuildMapMenu took 12.726562s
+    ===== [Nominations] BuildTierMenus took 12.379882s
+
+    New (1220 maps):
+    ===== [Nominations] Build ALL menus took 0.015625s
+    ```"""
     json_data = []
 
     # This needs to be dynamic depending on tickrates
@@ -198,8 +215,12 @@ def mapchooser(
     return json_data
 
 
-# SurfTimer
-@app.get("/surftimer/latestrecords")
+# ck_latestrecords
+@app.get(
+    "/surftimer/selectLatestRecords",
+    name="Get Latest Records",
+    tags=["SurfTimer", "ck_latestrecords"],
+)
 def selectLatestRecord(request: Request, response: Response):
     """Retrieves the last 50 records\n
     ```char sql_selectLatestRecords[] = ....```"""
@@ -215,34 +236,329 @@ def selectLatestRecord(request: Request, response: Response):
     return xquery
 
 
-@app.post("/surftimer/latestrecords")
+@app.post(
+    "/surftimer/insertLatestRecords",
+    name="Add Latest Record",
+    tags=["SurfTimer", "ck_latestrecords"],
+)
 def insertLatestRecord(
-    request: Request, steamid: str, name: str, runtime: float, mapname: str
+    request: Request,
+    response: Response,
+    steamid: str,
+    name: str,
+    runtime: float,
+    mapname: str,
 ):
     """Inserts a new record to the table\n
     ```char sql_insertLatestRecords[] = ....```"""
-    append_request_log(request)
-
     tic = time.perf_counter()
+    append_request_log(request)
 
     sql = surftimer.queries.sql_insertLatestRecords.format(
         steamid, name, runtime, mapname
     )
-    xquery = insertQuery(sql)
-    # xquery = 1
+    # xquery = insertQuery(sql)
+    xquery = 0
     # time.sleep(3)
 
-    toc = time.perf_counter()
-    print(f"Execution time {toc - tic:0.4f}")
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
 
     # Prepare the response
-    response = ResponseInsertQuery(xquery, float(format(toc - tic, ".4f")))
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
 
-    return response
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+# ck_maptier
+@app.get(
+    "/surftimer/selectMapTier",
+    name="Get Map Tier",
+    tags=["SurfTimer", "ck_maptier"],
+)
+def selectMapTier(
+    request: Request,
+    response: Response,
+    mapname: str,
+):
+    """`char[] sql_selectMapTier = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_selectMapTier.format(mapname)).pop()
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    xquery["xtime"] = time.perf_counter() - tic
+    return xquery
+
+
+@app.post(
+    "/surftimer/insertMapTier",
+    name="Add Map Tier",
+    tags=["SurfTimer", "ck_maptier"],
+)
+def insertMapTier(
+    request: Request,
+    response: Response,
+    mapname: str,
+    tier: int,
+):
+    """```c
+    char[] sql_insertmaptier = ....
+    ```"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = insertQuery(surftimer.queries.sql_insertmaptier.format(mapname, tier))
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.post(
+    "/surftimer/updateMapTier",
+    name="Update Map Tier",
+    tags=["SurfTimer", "ck_maptier"],
+)
+def updateMapTier(
+    request: Request,
+    response: Response,
+    mapname: str,
+    tier: int,
+):
+    """```c
+    char[] sql_updatemaptier = ....
+    ```"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = insertQuery(surftimer.queries.sql_updatemaptier.format(tier, mapname))
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.post(
+    "/surftimer/updateMapperName",
+    name="Update Mapper Name",
+    tags=["SurfTimer", "ck_maptier"],
+)
+def updateMapperName(
+    request: Request,
+    response: Response,
+    mapper: str,
+    mapname: int,
+):
+    """```c
+    char[] sql_updateMapperName = ....
+    ```"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = insertQuery(surftimer.queries.sql_updateMapperName.format(mapper, mapname))
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+# ck_playeroptions2
+@app.post(
+    "/surftimer/insertPlayerOptions",
+    name="Insert Player Options",
+    tags=["SurfTimer", "ck_playeroptions2"],
+)
+def insertPlayerOptions(request: Request, response: Response, steamid: str):
+    """```c
+    char[] sql_insertPlayerOptions = ....
+    ```"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = insertQuery(surftimer.queries.sql_insertPlayerOptions.format(steamid))
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+
+
+@app.get(
+    "/surftimer/selectPlayerOptions",
+    name="Get Player Options",
+    tags=["SurfTimer", "ck_playeroptions2"],
+)
+def selectPlayerOptions(request: Request, response: Response, steamid32: str):
+    """`char[] sql_selectPlayerOptions = ....`"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = selectQuery(surftimer.queries.sql_selectPlayerOptions.format(steamid32))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {"steamid32": steamid32}
+
+    toc = time.perf_counter()
+    xquery["xtime"] = toc - tic
+    print(f"Execution time {toc - tic:0.4f}")
+    return xquery
+
+
+@app.post(
+    "/surftimer/updatePlayerOptions",
+    name="Update Player Options",
+    tags=["SurfTimer", "ck_playeroptions2"],
+)
+def updatePlayerOptions(
+    request: Request,
+    response: Response,
+    timer: int,
+    hide: int,
+    sounds: int,
+    chat: int,
+    viewmodel: int,
+    autobhop: int,
+    checkpoints: int,
+    gradient: int,
+    speedmode: int,
+    centrespeed: int,
+    centrehud: int,
+    teleside: int,
+    module1c: int,
+    module2c: int,
+    module3c: int,
+    module4c: int,
+    module5c: int,
+    module6c: int,
+    sidehud: int,
+    module1s: int,
+    module2s: int,
+    module3s: int,
+    module4s: int,
+    module5s: int,
+    prestrafe: int,
+    cpmessages: int,
+    wrcpmessages: int,
+    hints: int,
+    csd_update_rate: int,
+    csd_pos_x: int,
+    csd_pos_y: int,
+    csd_r: int,
+    csd_g: int,
+    csd_b: int,
+    prespeedmode: int,
+    steamid: str,
+):
+    """```c
+    char[] sql_updatePlayerOptions = ....
+    ```"""
+    tic = time.perf_counter()
+    append_request_log(request)
+
+    xquery = insertQuery(
+        surftimer.queries.sql_updatePlayerOptions.format(
+            timer,
+            hide,
+            sounds,
+            chat,
+            viewmodel,
+            autobhop,
+            checkpoints,
+            gradient,
+            speedmode,
+            centrespeed,
+            centrehud,
+            teleside,
+            module1c,
+            module2c,
+            module3c,
+            module4c,
+            module5c,
+            module6c,
+            sidehud,
+            module1s,
+            module2s,
+            module3s,
+            module4s,
+            module5s,
+            prestrafe,
+            cpmessages,
+            wrcpmessages,
+            hints,
+            csd_update_rate,
+            csd_pos_x,
+            csd_pos_y,
+            csd_r,
+            csd_g,
+            csd_b,
+            prespeedmode,
+            steamid,
+        )
+    )
+
+    if xquery < 1:
+        JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+        )
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+    # output = ResponseInsertQuery(xquery)
+
+    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
 
 # new code 👇
-@app.get("/api/private")
+@app.get("/api/private", tags=["Private"], name="Test Authentication Tokens")
 def private(
     response: Response, token: str = Depends(token_auth_scheme)
 ):  # 👈 updated code
