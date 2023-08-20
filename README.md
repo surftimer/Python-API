@@ -3,8 +3,8 @@ SurfTimer FastAPI
 
 
 ## Pre-Requisites
-    - Create a `requests.json` file with `[]` inside
-    - Create a `denied.json` file with `[]` inside
+- Copy `config.json.example` to `config.json` and populate
+- Create `requests.json` and `denied.json` files
 
 
 ### To Do
