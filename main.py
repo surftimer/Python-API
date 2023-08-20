@@ -1,12 +1,12 @@
 # IMPORTS
 from datetime import datetime
-import json, time
+import json, time, redis
 from fastapi import FastAPI, Request, status, Depends, Response
 from fastapi.responses import JSONResponse, HTMLResponse
 from threading import Thread  # Not used yet
 
 
-from sql import selectQuery, insertQuery, syncQuery
+from sql import selectQuery, insertQuery
 import surftimer.queries  # Containing all SurfTimer queries from `queries.sp`
 
 
@@ -26,6 +26,13 @@ with open("requests.json") as fp:
 
 # Whitelisted IPs
 WHITELISTED_IPS = config["WHITELISTED_IPS"]
+
+# Initiate Redis connection
+redis_client = redis.Redis(
+    host=config["REDIS"]["HOST"],
+    port=config["REDIS"]["PORT"],
+    password=config["REDIS"]["PASSWORD"],
+)
 
 
 def append_request_log(request: Request):
@@ -66,7 +73,7 @@ app = FastAPI(
     title="SurfTimer API",
     description="""by [`tslashd`](https://github.com/tslashd)""",
     version="0.0.0",
-    debug=False,
+    debug=True,
     swagger_ui_parameters=swagger_config,
 )
 
@@ -115,12 +122,28 @@ def mapchooser(
     New (1220 maps):
     ===== [Nominations] Build ALL menus took 0.015625s
     ```"""
+    tic = time.perf_counter()
+
+    append_request_log(request)
+
     json_data = []
 
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(
+        f"mapchooser_{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}"
+    )
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'mapchooser_{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
     # This needs to be dynamic depending on tickrates
     db = "surftimer_test"
 
-    tic = time.perf_counter()
     switch_case = {
         # sql_SelectMapList - Mapchooser/Nominations
         1: f"""SELECT {db}.ck_zones.mapname, tier as maptier, count({db}.ck_zones.zonetype = 3) as stages, bonus as bonuses
@@ -214,6 +237,13 @@ def mapchooser(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
+    # Cache the data in Redis
+    redis_client.set(
+        f"mapchooser_{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}",
+        json.dumps(json_data),
+        ex=config["REDIS"]["EXPIRY"],
+    )
+
     return json_data
 
 
@@ -292,12 +322,39 @@ def selectMapTier(
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = selectQuery(surftimer.queries.sql_selectMapTier.format(mapname)).pop()
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectMapTier_{mapname}")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectMapTier_{mapname}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
+    xquery = selectQuery(surftimer.queries.sql_selectMapTier.format(mapname))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"mapname": mapname, "xtime": time.perf_counter() - tic},
+        )
+
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectMapTier_{mapname}",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
 
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    xquery["xtime"] = time.perf_counter() - tic
+    # xquery["xtime"] = time.perf_counter() - tic
     return xquery
 
 
@@ -321,7 +378,7 @@ def insertMapTier(
     xquery = insertQuery(surftimer.queries.sql_insertmaptier.format(mapname, tier))
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -354,7 +411,7 @@ def updateMapTier(
     xquery = insertQuery(surftimer.queries.sql_updatemaptier.format(tier, mapname))
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -387,7 +444,7 @@ def updateMapperName(
     xquery = insertQuery(surftimer.queries.sql_updateMapperName.format(mapper, mapname))
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -416,7 +473,7 @@ def insertPlayerOptions(request: Request, response: Response, steamid32: str):
     xquery = insertQuery(surftimer.queries.sql_insertPlayerOptions.format(steamid32))
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -439,6 +496,18 @@ def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     tic = time.perf_counter()
     append_request_log(request)
 
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectPlayerOptions_{steamid32}")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectPlayerOptions_{steamid32}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
     xquery = selectQuery(surftimer.queries.sql_selectPlayerOptions.format(steamid32))
 
     if xquery:
@@ -446,6 +515,13 @@ def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         xquery = {"steamid32": steamid32}
+
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectPlayerOptions_{steamid32}",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
 
     toc = time.perf_counter()
     xquery["xtime"] = toc - tic
@@ -546,7 +622,7 @@ def updatePlayerOptions(
     )
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -592,7 +668,7 @@ def insertPlayerRank(
     )
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -659,7 +735,7 @@ def updatePlayerRankPoints(
     )
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -732,7 +808,7 @@ def updatePlayerRankPoints2(
     )
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -769,7 +845,7 @@ def updatePlayerRank(
     )
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -796,6 +872,18 @@ def selectPlayerName(
     tic = time.perf_counter()
     append_request_log(request)
 
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectPlayerName_{steamid32}")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectPlayerName_{steamid32}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
     xquery = selectQuery(surftimer.queries.sql_selectPlayerName.format(steamid32))
 
     if xquery:
@@ -808,6 +896,13 @@ def selectPlayerName(
 
     print(f"Execution time {toc - tic:0.4f}")
     xquery["xtime"] = time.perf_counter() - tic
+
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectPlayerName_{steamid32}",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
     return xquery
 
 
@@ -827,7 +922,7 @@ def updateLastSeen(
     xquery = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
 
     if xquery < 1:
-        JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
         )
@@ -854,6 +949,18 @@ def selectTopPlayers(
     tic = time.perf_counter()
     append_request_log(request)
 
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectTopPlayers_{style}")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectTopPlayers_{style}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
     xquery = selectQuery(surftimer.queries.sql_selectTopPlayers.format(style))
 
     if xquery:
@@ -866,6 +973,13 @@ def selectTopPlayers(
 
     print(f"Execution time {toc - tic:0.4f}")
     # xquery["xtime"] = time.perf_counter() - tic
+
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectTopPlayers_{style}",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
     return xquery
 
 
@@ -884,6 +998,18 @@ def selectRankedPlayersRank(
     tic = time.perf_counter()
     append_request_log(request)
 
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectTopPlayers_{style}_{steamid32}")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectTopPlayers_{style}_{steamid32}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
     xquery = selectQuery(
         surftimer.queries.sql_selectRankedPlayersRank.format(style, steamid32, style)
     )
@@ -899,7 +1025,12 @@ def selectRankedPlayersRank(
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectTopPlayers_{style}_{steamid32}",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
     return xquery
 
 
@@ -912,6 +1043,18 @@ def selectRankedPlayers(request: Request, response: Response):
     """`char[] sql_selectRankedPlayers = ....`"""
     tic = time.perf_counter()
     append_request_log(request)
+
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectRankedPlayers")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectRankedPlayers' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
 
     xquery = selectQuery(surftimer.queries.sql_selectRankedPlayers)
     # xquery = []
@@ -926,7 +1069,12 @@ def selectRankedPlayers(request: Request, response: Response):
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectRankedPlayers",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
     return xquery
 
 
@@ -1005,6 +1153,18 @@ def selectPlayerProfile(
     tic = time.perf_counter()
     append_request_log(request)
 
+    # Check if data is cached in Redis
+    cached_data = redis_client.get(f"selectTopPlayers_{steamid32}_{style}")
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        print(
+            f"[Redis] Loaded 'selectTopPlayers_{steamid32}_{style}' ({time.perf_counter() - tic:0.4f}s)"
+        )
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
     xquery = selectQuery(
         surftimer.queries.sql_selectPlayerProfile.format(steamid32, style)
     )
@@ -1019,6 +1179,13 @@ def selectPlayerProfile(
 
     print(f"Execution time {toc - tic:0.4f}")
     xquery["xtime"] = time.perf_counter() - tic
+
+    # Cache the data in Redis
+    redis_client.set(
+        f"selectTopPlayers_{steamid32}_{style}",
+        json.dumps(xquery),
+        ex=config["REDIS"]["EXPIRY"],
+    )
     return xquery
 
 
