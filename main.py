@@ -6,6 +6,11 @@ from fastapi.responses import JSONResponse
 from auth import VerifyToken
 from threading import Thread  # Not used yet
 
+# Templates
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html
+
 from globals import (
     token_auth_scheme,
     config,
@@ -40,9 +45,16 @@ class ResponseInsertQuery:
 # Swagger UI configuration
 swagger_config = {
     "displayOperationId": False,  # Show operationId on the UI
-    "defaultModelsExpandDepth": -1,  # The default expansion depth for models (set to -1 completely hide the models)
+    "defaultModelsExpandDepth": 1,  # The default expansion depth for models (set to -1 completely hide the models)
+    "defaultModelExpandDepth": 2,
     "deepLinking": True,  # Enables deep linking for tags and operations
     "useUnsafeMarkdown": True,
+    "displayRequestDuration": True,
+    "filter": True,
+    "showExtensions": True,
+    "syntaxHighlight.theme": "obsidian",
+    "docExpansion": "none",
+    "pluginLoadType": "chain",
 }
 app = FastAPI(
     title="SurfTimer API",
@@ -50,9 +62,25 @@ app = FastAPI(
     version="0.0.0",
     debug=True,
     swagger_ui_parameters=swagger_config,
+    # docs_url=None,
 )
 
-# Attach the routes 
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+# templates = Jinja2Templates(directory="templates")
+
+@app.get("/docs2", include_in_schema=False)
+async def custom_swagger_ui_html_cdn():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - Swagger UI",
+        # swagger_ui_dark.css CDN link
+        swagger_css_url="https://cdn.jsdelivr.net/gh/Itz-fork/Fastapi-Swagger-UI-Dark/assets/swagger_ui_dark.min.css",
+        # swagger_css_url="https://raw.clarityeu.com/theme-newspaper.css",
+        swagger_ui_parameters=swagger_config,
+    )
+
+
+# Attach the routes
 app.include_router(ck_latestrecords_router)
 app.include_router(ck_maptier_router)
 app.include_router(ck_playerrank_router)
@@ -75,16 +103,19 @@ async def validate_ip(request: Request, call_next):
 
 
 @app.get("/")
-def home():
+async def home():
     data = {"message": "Suuuuh duuuud"}
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)
 
 
 # SurfTimer-Mapchooser queries
 @app.get(
-    "/surftimer/mapchooser", name="Mapchooser & Nominations & RTV", tags=["Mapchooser"]
+    "/surftimer/mapchooser",
+    name="Mapchooser & Nominations & RTV",
+    tags=["Mapchooser"],
+    include_in_schema=False,
 )
-def mapchooser(
+async def mapchooser(
     request: Request,
     type: int,
     server_tier: str = None,
@@ -263,8 +294,13 @@ def mapchooser(
 
 
 # new code 👇
-@app.get("/api/private", tags=["Private"], name="Test Authentication Tokens")
-def private(
+@app.get(
+    "/api/private",
+    tags=["Private"],
+    name="Test Authentication Tokens",
+    include_in_schema=False,
+)
+async def private(
     response: Response, token: str = Depends(token_auth_scheme)
 ):  # 👈 updated code
     """A valid access token is required to access this route"""
