@@ -1,4 +1,4 @@
-import json, redis
+import json, redis, time
 from decimal import Decimal
 from fastapi.security import HTTPBearer
 from fastapi import Request
@@ -45,8 +45,42 @@ def append_request_log(request: Request):
         json.dump(log, json_file, indent=4, separators=(",", ": "))
 
 
+def set_cache(cache_key: str, data):
+    """Cache the data in Redis\n
+    `Decimal` values are converted to `String`"""
+    redis_client.set(
+        cache_key,
+        json.dumps(data, default=json_decimal),
+        ex=config["REDIS"]["EXPIRY"],
+    )
+
+    return True
+
+
+def get_cache(cache_key: str):
+    """Try and get cached data from Redis"""
+    cached_data = redis_client.get(cache_key)
+    if cached_data:
+        # Return cached data
+        # print(json.loads(cached_data))
+        return cached_data
+    else:
+        return None
+
+
+def json_decimal(obj):
+    """Convert all instances of `Decimal` to `String`\n
+    `"runtime": 14.7363` > `"runtime": "14.736300"`\n
+    `"runtime": 11.25` > `"runtime": "11.250000"`"""
+    if isinstance(obj, Decimal):
+        return str(obj)
+    raise TypeError
+
+
+
 class PlayerOptions(BaseModel):
     """To be used for `updatePlayerOptions` endpoint"""
+
     timer: int
     hide: int
     sounds: int

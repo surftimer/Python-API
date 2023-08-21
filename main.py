@@ -18,10 +18,12 @@ from globals import (
 from sql import selectQuery, insertQuery
 import surftimer.queries  # Containing all SurfTimer queries from `queries.sp`
 
+# Import all the endpoints for each table
 from surftimer.ck_latestrecords import router as ck_latestrecords_router
 from surftimer.ck_maptier import router as ck_maptier_router
 from surftimer.ck_playerrank import router as ck_playerrank_router
 from surftimer.ck_playeroptions2 import router as ck_playeroptions2_router
+from surftimer.ck_bonus import router as ck_bonus_router
 
 
 # Responses
@@ -50,10 +52,13 @@ app = FastAPI(
     debug=True,
     swagger_ui_parameters=swagger_config,
 )
+
+# Attach the routes 
 app.include_router(ck_latestrecords_router)
 app.include_router(ck_maptier_router)
 app.include_router(ck_playerrank_router)
 app.include_router(ck_playeroptions2_router)
+app.include_router(ck_bonus_router)
 
 
 @app.middleware("http")
