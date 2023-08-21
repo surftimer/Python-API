@@ -108,7 +108,7 @@ def updateMapTier(
     if xquery < 1:
         return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+            content={"updated": xquery, "xtime": time.perf_counter() - tic},
         )
 
     # Prepare the response
@@ -116,7 +116,7 @@ def updateMapTier(
     print(f"Execution time {toc - tic:0.4f}")
     # output = ResponseInsertQuery(xquery)
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
 
 @router.put(
