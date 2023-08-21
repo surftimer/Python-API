@@ -3,6 +3,7 @@ from decimal import Decimal
 from fastapi.security import HTTPBearer
 from fastapi import Request
 from datetime import datetime
+from auth import VerifyToken
 
 token_auth_scheme = HTTPBearer()
 

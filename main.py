@@ -12,6 +12,7 @@ from globals import (
     log,
     WHITELISTED_IPS,
     append_request_log,
+    VerifyToken
 )
 
 from sql import selectQuery, insertQuery

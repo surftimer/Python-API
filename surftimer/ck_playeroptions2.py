@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
-from sql import selectQuery
+from sql import selectQuery, insertQuery
 from globals import redis_client, config, append_request_log
 import time, json
 import surftimer.queries
