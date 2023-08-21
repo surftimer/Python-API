@@ -10,7 +10,6 @@ from globals import (
     token_auth_scheme,
     config,
     redis_client,
-    log,
     WHITELISTED_IPS,
     append_request_log,
 )
