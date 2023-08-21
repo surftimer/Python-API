@@ -7,6 +7,7 @@ sql_createBonus = "CREATE TABLE IF NOT EXISTS ck_bonus (steamid VARCHAR(32), nam
 sql_createBonusIndex = (
     "CREATE INDEX bonusrank ON ck_bonus (mapname,runtime,zonegroup,style);"
 )
+
 sql_insertBonus = "INSERT INTO ck_bonus (steamid, name, mapname, runtime, zonegroup, velStartXY, velStartXYZ, velStartZ) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')"
 sql_updateBonus = "UPDATE ck_bonus SET runtime = '{}', name = '{}', velStartXY = {}, velStartXYZ = {}, velStartZ = {} WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {} AND style = 0"
 sql_selectBonusCount = "SELECT zonegroup, style, count(1) FROM ck_bonus WHERE mapname = '{}' GROUP BY zonegroup, style;"
