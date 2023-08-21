@@ -54,7 +54,7 @@ class PlayerOptions(BaseModel):
     name="Insert Player Options",
     tags=["ck_playeroptions2"],
 )
-def insertPlayerOptions(request: Request, response: Response, steamid32: str):
+async def insertPlayerOptions(request: Request, response: Response, steamid32: str):
     """```c
     char[] sql_insertPlayerOptions = ....
     ```"""
@@ -82,7 +82,7 @@ def insertPlayerOptions(request: Request, response: Response, steamid32: str):
     name="Get Player Options",
     tags=["ck_playeroptions2"],
 )
-def selectPlayerOptions(request: Request, response: Response, steamid32: str):
+async def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     """`char[] sql_selectPlayerOptions = ....`"""
     tic = time.perf_counter()
     append_request_log(request)
@@ -119,7 +119,7 @@ def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     name="Update Player Options",
     tags=["ck_playeroptions2"],
 )
-def updatePlayerOptions(request: Request, response: Response, data: PlayerOptions):
+async def updatePlayerOptions(request: Request, response: Response, data: PlayerOptions):
     """```c
     char[] sql_updatePlayerOptions = ....
     ```"""

@@ -14,7 +14,7 @@ router = APIRouter()
     name="Get Latest Records",
     tags=["ck_latestrecords"],
 )
-def selectLatestRecord(request: Request, response: Response):
+async def selectLatestRecord(request: Request, response: Response):
     """Retrieves the last 50 records\n
     ```char sql_selectLatestRecords[] = ....```"""
     tic = time.perf_counter()
@@ -54,7 +54,7 @@ def selectLatestRecord(request: Request, response: Response):
     name="Add Latest Record",
     tags=["ck_latestrecords"],
 )
-def insertLatestRecord(
+async def insertLatestRecord(
     request: Request,
     response: Response,
     steamid32: str,

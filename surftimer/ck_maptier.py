@@ -14,7 +14,7 @@ router = APIRouter()
     name="Get Map Tier",
     tags=["ck_maptier"],
 )
-def selectMapTier(
+async def selectMapTier(
     request: Request,
     response: Response,
     mapname: str,
@@ -58,7 +58,7 @@ def selectMapTier(
     name="Add Map Tier",
     tags=["ck_maptier"],
 )
-def insertMapTier(
+async def insertMapTier(
     request: Request,
     response: Response,
     mapname: str,
@@ -91,7 +91,7 @@ def insertMapTier(
     name="Update Map Tier",
     tags=["ck_maptier"],
 )
-def updateMapTier(
+async def updateMapTier(
     request: Request,
     response: Response,
     mapname: str,
@@ -124,7 +124,7 @@ def updateMapTier(
     name="Update Mapper Name",
     tags=["ck_maptier"],
 )
-def updateMapperName(
+async def updateMapperName(
     request: Request,
     response: Response,
     mapper: str,
