@@ -2,8 +2,35 @@ from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
 from globals import append_request_log, get_cache, set_cache
+from pydantic import BaseModel
 import time, json
 import surftimer.queries
+
+class UpdatePlayerPoints(BaseModel):
+    name: str
+    points: str
+    wrpoints: int
+    wrbpoints: int
+    wrcppoints: int
+    top10points: int
+    groupspoints: int
+    mappoints: int
+    bonuspoints: int
+    finishedmapspro: str
+    finishedbonuses: int
+    finishedstages: int
+    wrs: int
+    wrbs: int
+    wrcps: int
+    top10s: int
+    groups: int
+    country: str = None
+    countryCode: str = None
+    continentCode: str = None
+    steamid32: str
+    style: int
+
+
 
 router = APIRouter()
 
@@ -14,7 +41,7 @@ router = APIRouter()
     name="Add Player Rank",
     tags=["ck_playerrank"],
 )
-def insertPlayerRank(
+async def insertPlayerRank(
     request: Request,
     response: Response,
     steamid32,
@@ -60,52 +87,34 @@ def insertPlayerRank(
     name="Update Player Rank Points 1",
     tags=["ck_playerrank"],
 )
-def updatePlayerRankPoints(
+async def updatePlayerRankPoints(
     request: Request,
     response: Response,
-    name: str,
-    points: str,
-    wrpoints: int,
-    wrbpoints: int,
-    wrcppoints: int,
-    top10points: int,
-    groupspoints: int,
-    mappoints: int,
-    bonuspoints: int,
-    finishedmapspro: str,
-    finishedbonuses: int,
-    finishedstages: int,
-    wrs: int,
-    wrbs: int,
-    wrcps: int,
-    top10s: int,
-    groups: int,
-    steamid32: str,
-    style: int,
+    data: UpdatePlayerPoints,
 ):
     tic = time.perf_counter()
     append_request_log(request)
 
     sql = surftimer.queries.sql_updatePlayerRankPoints.format(
-        name,
-        points,
-        wrpoints,
-        wrbpoints,
-        wrcppoints,
-        top10points,
-        groupspoints,
-        mappoints,
-        bonuspoints,
-        finishedmapspro,
-        finishedbonuses,
-        finishedstages,
-        wrs,
-        wrbs,
-        wrcps,
-        top10s,
-        groups,
-        steamid32,
-        style,
+        data.name,
+        data.points,
+        data.wrpoints,
+        data.wrbpoints,
+        data.wrcppoints,
+        data.top10points,
+        data.groupspoints,
+        data.mappoints,
+        data.bonuspoints,
+        data.finishedmapspro,
+        data.finishedbonuses,
+        data.finishedstages,
+        data.wrs,
+        data.wrbs,
+        data.wrcps,
+        data.top10s,
+        data.groups,
+        data.steamid32,
+        data.style,
     )
     xquery = insertQuery(sql)
 
@@ -128,58 +137,37 @@ def updatePlayerRankPoints(
     name="Update Player Rank Points 2",
     tags=["ck_playerrank"],
 )
-def updatePlayerRankPoints2(
+async def updatePlayerRankPoints2(
     request: Request,
     response: Response,
-    name: str,
-    points: str,
-    wrpoints: int,
-    wrbpoints: int,
-    wrcppoints: int,
-    top10points: int,
-    groupspoints: int,
-    mappoints: int,
-    bonuspoints: int,
-    finishedmapspro: str,
-    finishedbonuses: int,
-    finishedstages: int,
-    wrs: int,
-    wrbs: int,
-    wrcps: int,
-    top10s: int,
-    groups: int,
-    country: str,
-    countryCode: str,
-    continentCode: str,
-    steamid32: str,
-    style: int,
+    data: UpdatePlayerPoints,
 ):
     tic = time.perf_counter()
     append_request_log(request)
 
     sql = surftimer.queries.sql_updatePlayerRankPoints2.format(
-        name,
-        points,
-        wrpoints,
-        wrbpoints,
-        wrcppoints,
-        top10points,
-        groupspoints,
-        mappoints,
-        bonuspoints,
-        finishedmapspro,
-        finishedbonuses,
-        finishedstages,
-        wrs,
-        wrbs,
-        wrcps,
-        top10s,
-        groups,
-        country,
-        countryCode,
-        continentCode,
-        steamid32,
-        style,
+        data.name,
+        data.points,
+        data.wrpoints,
+        data.wrbpoints,
+        data.wrcppoints,
+        data.top10points,
+        data.groupspoints,
+        data.mappoints,
+        data.bonuspoints,
+        data.finishedmapspro,
+        data.finishedbonuses,
+        data.finishedstages,
+        data.wrs,
+        data.wrbs,
+        data.wrcps,
+        data.top10s,
+        data.groups,
+        data.country,
+        data.countryCode,
+        data.continentCode,
+        data.steamid32,
+        data.style,
     )
     xquery = insertQuery(sql)
 
@@ -199,10 +187,10 @@ def updatePlayerRankPoints2(
 
 @router.put(
     "surftimer/updatePlayerRank",
-    name="Update Player Rank Points 2",
+    name="Update Player Rank",
     tags=["ck_playerrank"],
 )
-def updatePlayerRank(
+async def updatePlayerRank(
     request: Request,
     response: Response,
     finishedmaps: str,
@@ -240,7 +228,7 @@ def updatePlayerRank(
     name="Select Player Name",
     tags=["ck_playerrank"],
 )
-def selectPlayerName(
+async def selectPlayerName(
     request: Request,
     response: Response,
     steamid32: str,
@@ -282,7 +270,7 @@ def selectPlayerName(
     name="Update Last Seen",
     tags=["ck_playerrank"],
 )
-def updateLastSeen(
+async def updateLastSeen(
     request: Request,
     response: Response,
     steamid32: str,
@@ -312,7 +300,7 @@ def updateLastSeen(
     name="Select Top Players",
     tags=["ck_playerrank"],
 )
-def selectTopPlayers(
+async def selectTopPlayers(
     request: Request,
     response: Response,
     style: int,
@@ -353,7 +341,7 @@ def selectTopPlayers(
     name="Select Ranked Players Rank",
     tags=["ck_playerrank"],
 )
-def selectRankedPlayersRank(
+async def selectRankedPlayersRank(
     request: Request,
     response: Response,
     style: int,
@@ -397,7 +385,7 @@ def selectRankedPlayersRank(
     name="Select Ranked Players",
     tags=["ck_playerrank"],
 )
-def selectRankedPlayers(request: Request, response: Response):
+async def selectRankedPlayers(request: Request, response: Response):
     """`char[] sql_selectRankedPlayers = ....`"""
     tic = time.perf_counter()
     append_request_log(request)
@@ -436,7 +424,7 @@ def selectRankedPlayers(request: Request, response: Response):
     name="Count Ranked Players",
     tags=["ck_playerrank"],
 )
-def countRankedPlayers(
+async def countRankedPlayers(
     request: Request,
     response: Response,
     style: int,
@@ -476,7 +464,7 @@ def countRankedPlayers(
     name="Count Ranked Players 2",
     tags=["ck_playerrank"],
 )
-def countRankedPlayers2(
+async def countRankedPlayers2(
     request: Request,
     response: Response,
     style: int,
@@ -516,7 +504,7 @@ def countRankedPlayers2(
     name="Select Player Profile",
     tags=["ck_playerrank"],
 )
-def selectPlayerProfile(
+async def selectPlayerProfile(
     request: Request,
     response: Response,
     steamid32: str,
