@@ -81,4 +81,4 @@ def json_decimal(obj):
                         obj[i][key] = str(value)
         return obj
     # If it's neither a Decimal nor a list of dictionaries, return it as is
-    return obj
+    return str(obj)
