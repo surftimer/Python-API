@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import redis_client, config, append_request_log
+from globals import redis_client, config, append_request_log, get_cache, set_cache
 import time, json
 import surftimer.queries
 
@@ -24,13 +24,11 @@ def selectMapTier(
     append_request_log(request)
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(f"selectMapTier_{mapname}")
-    if cached_data:
-        # Return cached data
-        # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'selectMapTier_{mapname}' ({time.perf_counter() - tic:0.4f}s)"
-        )
+    cache_key = f"selectMapTier_{mapname}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -46,16 +44,12 @@ def selectMapTier(
         )
 
     # Cache the data in Redis
-    redis_client.set(
-        f"selectMapTier_{mapname}",
-        json.dumps(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
+    set_cache(cache_key, xquery)
 
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    # xquery["xtime"] = time.perf_counter() - tic
+    
     return xquery
 
 
@@ -92,7 +86,7 @@ def insertMapTier(
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
 
-@router.post(
+@router.put(
     "/surftimer/updateMapTier",
     name="Update Map Tier",
     tags=["SurfTimer", "ck_maptier"],
@@ -125,7 +119,7 @@ def updateMapTier(
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
 
-@router.post(
+@router.put(
     "/surftimer/updateMapperName",
     name="Update Mapper Name",
     tags=["SurfTimer", "ck_maptier"],
