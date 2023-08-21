@@ -8,7 +8,6 @@ from globals import (
     append_request_log,
     set_cache,
     get_cache,
-    PlayerOptions,
 )
 import time, json, surftimer.queries
 

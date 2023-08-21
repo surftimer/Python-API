@@ -2,7 +2,8 @@
 from datetime import datetime
 import json, time
 from fastapi import FastAPI, Request, status, Depends, Response
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse
+from auth import VerifyToken
 from threading import Thread  # Not used yet
 
 from globals import (
@@ -12,7 +13,6 @@ from globals import (
     log,
     WHITELISTED_IPS,
     append_request_log,
-    VerifyToken,
 )
 
 from sql import selectQuery, insertQuery
