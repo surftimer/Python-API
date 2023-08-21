@@ -4,6 +4,8 @@ from fastapi.security import HTTPBearer
 from fastapi import Request
 from datetime import datetime
 from auth import VerifyToken
+from pydantic import BaseModel
+
 
 token_auth_scheme = HTTPBearer()
 
@@ -41,3 +43,43 @@ def append_request_log(request: Request):
     )
     with open("requests.json", "w") as json_file:
         json.dump(log, json_file, indent=4, separators=(",", ": "))
+
+
+class PlayerOptions(BaseModel):
+    """To be used for `updatePlayerOptions` endpoint"""
+    timer: int
+    hide: int
+    sounds: int
+    chat: int
+    viewmodel: int
+    autobhop: int
+    checkpoints: int
+    gradient: int
+    speedmode: int
+    centrespeed: int
+    centrehud: int
+    teleside: int
+    module1c: int
+    module2c: int
+    module3c: int
+    module4c: int
+    module5c: int
+    module6c: int
+    sidehud: int
+    module1s: int
+    module2s: int
+    module3s: int
+    module4s: int
+    module5s: int
+    prestrafe: int
+    cpmessages: int
+    wrcpmessages: int
+    hints: int
+    csd_update_rate: int
+    csd_pos_x: int
+    csd_pos_y: int
+    csd_r: int
+    csd_g: int
+    csd_b: int
+    prespeedmode: int
+    steamid32: str
