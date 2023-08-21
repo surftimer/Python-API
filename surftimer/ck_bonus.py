@@ -13,6 +13,17 @@ from globals import (
 import time, json, surftimer.queries
 
 
+class NewBonus(BaseModel):
+    steamid32: str
+    name: str
+    mapname: str
+    runtime: int
+    zonegroup: int
+    velStartXY: int
+    velStartXYZ: int
+    velStartZ: int
+
+
 class PlayerRankBonus(BaseModel):
     """To be used for `selectPlayerRankBonus` endpoint"""
 
@@ -28,19 +39,12 @@ router = APIRouter()
 @router.post(
     "/surftimer/insertBonus",
     name="Add Bonus Time",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def insertBonus(
     request: Request,
     response: Response,
-    steamid32: str,
-    name: str,
-    mapname: str,
-    runtime: int,
-    zonegroup: int,
-    velStartXY: int,
-    velStartXYZ: int,
-    velStartZ: int,
+    data: NewBonus,
 ):
     """Inserts a new record to the table\n
     ```char sql_insertLatestRecords[] = ....```"""
@@ -48,14 +52,14 @@ def insertBonus(
     append_request_log(request)
 
     sql = surftimer.queries.sql_insertBonus.format(
-        steamid32,
-        name,
-        mapname,
-        runtime,
-        zonegroup,
-        velStartXY,
-        velStartXYZ,
-        velStartZ,
+        data.steamid32,
+        data.name,
+        data.mapname,
+        data.runtime,
+        data.zonegroup,
+        data.velStartXY,
+        data.velStartXYZ,
+        data.velStartZ,
     )
     xquery = insertQuery(sql)
     # xquery = 0
@@ -78,33 +82,26 @@ def insertBonus(
 @router.put(
     "/surftimer/updateBonus",
     name="Update Bonus Time",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def updateBonus(
     request: Request,
     response: Response,
-    steamid32: str,
-    name: str,
-    mapname: str,
-    runtime: str,
-    zonegroup: int,
-    velStartXY: int,
-    velStartXYZ: int,
-    velStartZ: int,
+    data: NewBonus,
 ):
     """```char sql_updateBonus[] = ....```"""
     tic = time.perf_counter()
     append_request_log(request)
 
     sql = surftimer.queries.sql_updateBonus.format(
-        runtime,
-        name,
-        velStartXY,
-        velStartXYZ,
-        velStartZ,
-        steamid32,
-        mapname,
-        zonegroup,
+        data.runtime,
+        data.name,
+        data.velStartXY,
+        data.velStartXYZ,
+        data.velStartZ,
+        data.steamid32,
+        data.mapname,
+        data.zonegroup,
     )
     xquery = insertQuery(sql)
 
@@ -124,7 +121,7 @@ def updateBonus(
 @router.get(
     "/surftimer/selectBonusCount",
     name="Get Bonus Count",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def selectBonusCount(request: Request, response: Response, mapname: str):
     """Retrieves all the bonuses for the map provided\n
@@ -162,7 +159,7 @@ def selectBonusCount(request: Request, response: Response, mapname: str):
 @router.get(
     "/surftimer/selectPersonalBonusRecords",
     name="Get Personal Bonus Records",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def selectPersonalBonusRecords(
     request: Request, response: Response, steamid32: str, mapname: str
@@ -205,7 +202,7 @@ def selectPersonalBonusRecords(
 @router.get(
     "/surftimer/selectPlayerRankBonus",
     name="Get Player Rank Bonus",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def selectPlayerRankBonus(
     request: Request,
@@ -256,7 +253,7 @@ def selectPlayerRankBonus(
 @router.get(
     "/surftimer/selectFastestBonus",
     name="Get Fastest Bonus",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def selectFastestBonus(
     request: Request,
@@ -297,7 +294,7 @@ def selectFastestBonus(
 @router.get(
     "/surftimer/selectAllBonusTimesinMap",
     name="Get All Bonus Times For Map",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def selectAllBonusTimesinMap(
     request: Request,
@@ -338,7 +335,7 @@ def selectAllBonusTimesinMap(
 @router.get(
     "/surftimer/selectTopBonusSurfers",
     name="Get All Top Bonus Surfers",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def selectTopBonusSurfers(
     request: Request,
@@ -388,7 +385,7 @@ def selectTopBonusSurfers(
 @router.delete(
     "/surftimer/deleteBonus",
     name="Delete Bonus",
-    tags=["SurfTimer", "ck_bonus"],
+    tags=["ck_bonus"],
 )
 def deleteBonus(
     request: Request,

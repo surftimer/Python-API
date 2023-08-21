@@ -52,7 +52,7 @@ class PlayerOptions(BaseModel):
 @router.post(
     "/surftimer/insertPlayerOptions",
     name="Insert Player Options",
-    tags=["SurfTimer", "ck_playeroptions2"],
+    tags=["ck_playeroptions2"],
 )
 def insertPlayerOptions(request: Request, response: Response, steamid32: str):
     """```c
@@ -80,7 +80,7 @@ def insertPlayerOptions(request: Request, response: Response, steamid32: str):
 @router.get(
     "/surftimer/selectPlayerOptions",
     name="Get Player Options",
-    tags=["SurfTimer", "ck_playeroptions2"],
+    tags=["ck_playeroptions2"],
 )
 def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     """`char[] sql_selectPlayerOptions = ....`"""
@@ -117,7 +117,7 @@ def selectPlayerOptions(request: Request, response: Response, steamid32: str):
 @router.put(
     "/surftimer/updatePlayerOptions",
     name="Update Player Options",
-    tags=["SurfTimer", "ck_playeroptions2"],
+    tags=["ck_playeroptions2"],
 )
 def updatePlayerOptions(request: Request, response: Response, data: PlayerOptions):
     """```c

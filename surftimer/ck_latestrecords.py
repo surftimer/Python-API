@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get(
     "/surftimer/selectLatestRecords",
     name="Get Latest Records",
-    tags=["SurfTimer", "ck_latestrecords"],
+    tags=["ck_latestrecords"],
 )
 def selectLatestRecord(request: Request, response: Response):
     """Retrieves the last 50 records\n
@@ -52,7 +52,7 @@ def selectLatestRecord(request: Request, response: Response):
 @router.post(
     "/surftimer/insertLatestRecords",
     name="Add Latest Record",
-    tags=["SurfTimer", "ck_latestrecords"],
+    tags=["ck_latestrecords"],
 )
 def insertLatestRecord(
     request: Request,

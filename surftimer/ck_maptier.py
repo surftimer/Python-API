@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get(
     "/surftimer/selectMapTier",
     name="Get Map Tier",
-    tags=["SurfTimer", "ck_maptier"],
+    tags=["ck_maptier"],
 )
 def selectMapTier(
     request: Request,
@@ -56,7 +56,7 @@ def selectMapTier(
 @router.post(
     "/surftimer/insertMapTier",
     name="Add Map Tier",
-    tags=["SurfTimer", "ck_maptier"],
+    tags=["ck_maptier"],
 )
 def insertMapTier(
     request: Request,
@@ -89,7 +89,7 @@ def insertMapTier(
 @router.put(
     "/surftimer/updateMapTier",
     name="Update Map Tier",
-    tags=["SurfTimer", "ck_maptier"],
+    tags=["ck_maptier"],
 )
 def updateMapTier(
     request: Request,
@@ -122,7 +122,7 @@ def updateMapTier(
 @router.put(
     "/surftimer/updateMapperName",
     name="Update Mapper Name",
-    tags=["SurfTimer", "ck_maptier"],
+    tags=["ck_maptier"],
 )
 def updateMapperName(
     request: Request,

@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post(
     "surftimer/insertPlayerRank",
     name="Add Player Rank",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def insertPlayerRank(
     request: Request,
@@ -58,7 +58,7 @@ def insertPlayerRank(
 @router.put(
     "surftimer/updatePlayerRankPoints",
     name="Update Player Rank Points 1",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def updatePlayerRankPoints(
     request: Request,
@@ -126,7 +126,7 @@ def updatePlayerRankPoints(
 @router.put(
     "surftimer/updatePlayerRankPoints2",
     name="Update Player Rank Points 2",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def updatePlayerRankPoints2(
     request: Request,
@@ -200,7 +200,7 @@ def updatePlayerRankPoints2(
 @router.put(
     "surftimer/updatePlayerRank",
     name="Update Player Rank Points 2",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def updatePlayerRank(
     request: Request,
@@ -238,7 +238,7 @@ def updatePlayerRank(
 @router.get(
     "/surftimer/selectPlayerName",
     name="Select Player Name",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def selectPlayerName(
     request: Request,
@@ -280,7 +280,7 @@ def selectPlayerName(
 @router.put(
     "surftimer/updateLastSeenMySQL",
     name="Update Last Seen",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def updateLastSeen(
     request: Request,
@@ -310,7 +310,7 @@ def updateLastSeen(
 @router.get(
     "/surftimer/selectTopPlayers",
     name="Select Top Players",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def selectTopPlayers(
     request: Request,
@@ -351,7 +351,7 @@ def selectTopPlayers(
 @router.get(
     "/surftimer/selectRankedPlayersRank",
     name="Select Ranked Players Rank",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def selectRankedPlayersRank(
     request: Request,
@@ -395,7 +395,7 @@ def selectRankedPlayersRank(
 @router.get(
     "/surftimer/selectRankedPlayers",
     name="Select Ranked Players",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def selectRankedPlayers(request: Request, response: Response):
     """`char[] sql_selectRankedPlayers = ....`"""
@@ -434,7 +434,7 @@ def selectRankedPlayers(request: Request, response: Response):
 @router.get(
     "/surftimer/countRankedPlayers",
     name="Count Ranked Players",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def countRankedPlayers(
     request: Request,
@@ -474,7 +474,7 @@ def countRankedPlayers(
 @router.get(
     "/surftimer/countRankedPlayers2",
     name="Count Ranked Players 2",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def countRankedPlayers2(
     request: Request,
@@ -514,7 +514,7 @@ def countRankedPlayers2(
 @router.get(
     "/surftimer/selectPlayerProfile",
     name="Select Player Profile",
-    tags=["SurfTimer", "ck_playerrank"],
+    tags=["ck_playerrank"],
 )
 def selectPlayerProfile(
     request: Request,
