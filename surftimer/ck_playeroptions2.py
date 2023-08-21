@@ -114,7 +114,7 @@ def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     return xquery
 
 
-@router.post(
+@router.put(
     "/surftimer/updatePlayerOptions",
     name="Update Player Options",
     tags=["SurfTimer", "ck_playeroptions2"],
