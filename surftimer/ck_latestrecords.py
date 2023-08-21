@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
-from sql import selectQuery
-from globals import redis_client, config, append_request_log
+from sql import selectQuery, insertQuery
+from globals import append_request_log, get_cache, set_cache
 import time, json
 import surftimer.queries
 
@@ -21,17 +21,16 @@ def selectLatestRecord(request: Request, response: Response):
 
     append_request_log(request)
 
-    # # Check if data is cached in Redis -- Errors out in here for some reason 
-    # cached_data = redis_client.get("selectLatestRecord")
-    # if cached_data:
-    #     # Return cached data
-    #     # print(json.loads(cached_data))
-    #     print(
-    #         f"[Redis] Loaded 'selectLatestRecord' ({time.perf_counter() - tic:0.4f}s)"
-    #     )
-    #     return JSONResponse(
-    #         status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-    #     )
+    # Check if data is cached in Redis
+    cache_key = f"selectLatestRecord"
+    cached_data = get_cache(cache_key)
+
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
 
     xquery = selectQuery(surftimer.queries.sql_selectLatestRecords)
 
@@ -45,11 +44,7 @@ def selectLatestRecord(request: Request, response: Response):
     print(f"Execution time {toc - tic:0.4f}")
 
     # Cache the data in Redis
-    redis_client.set(
-        f"selectLatestRecord",
-        str(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
+    set_cache(cache_key, xquery)
 
     return xquery
 
@@ -75,8 +70,8 @@ def insertLatestRecord(
     sql = surftimer.queries.sql_insertLatestRecords.format(
         steamid32, name, runtime, mapname
     )
-    # xquery = insertQuery(sql)
-    xquery = 0
+    xquery = insertQuery(sql)
+    # xquery = 0
     # time.sleep(3)
 
     if xquery < 1:
@@ -88,6 +83,5 @@ def insertLatestRecord(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
