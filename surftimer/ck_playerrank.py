@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
-from sql import selectQuery
-from globals import redis_client, config, append_request_log
+from sql import selectQuery, insertQuery
+from globals import append_request_log, get_cache, set_cache
 import time, json
 import surftimer.queries
 
 router = APIRouter()
-
 
 
 # ck_playerrank
@@ -30,7 +29,7 @@ def insertPlayerRank(
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = surftimer.queries.sql_insertPlayerRank.format(
+    sql = surftimer.queries.sql_insertPlayerRank.format(
         steamid32,
         steamid64,
         name,
@@ -40,6 +39,7 @@ def insertPlayerRank(
         joined,
         style,
     )
+    xquery = insertQuery(sql)
 
     if xquery < 1:
         return JSONResponse(
@@ -55,7 +55,7 @@ def insertPlayerRank(
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
 
-@router.post(
+@router.put(
     "surftimer/updatePlayerRankPoints",
     name="Update Player Rank Points 1",
     tags=["SurfTimer", "ck_playerrank"],
@@ -86,7 +86,7 @@ def updatePlayerRankPoints(
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = surftimer.queries.sql_updatePlayerRankPoints.format(
+    sql = surftimer.queries.sql_updatePlayerRankPoints.format(
         name,
         points,
         wrpoints,
@@ -107,11 +107,12 @@ def updatePlayerRankPoints(
         steamid32,
         style,
     )
+    xquery = insertQuery(sql)
 
     if xquery < 1:
         return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+            content={"updated": xquery, "xtime": time.perf_counter() - tic},
         )
 
     # Prepare the response
@@ -119,10 +120,10 @@ def updatePlayerRankPoints(
     print(f"Execution time {toc - tic:0.4f}")
     # output = ResponseInsertQuery(xquery)
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
 
-@router.post(
+@router.put(
     "surftimer/updatePlayerRankPoints2",
     name="Update Player Rank Points 2",
     tags=["SurfTimer", "ck_playerrank"],
@@ -156,7 +157,7 @@ def updatePlayerRankPoints2(
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = surftimer.queries.sql_updatePlayerRankPoints2.format(
+    sql = surftimer.queries.sql_updatePlayerRankPoints2.format(
         name,
         points,
         wrpoints,
@@ -180,11 +181,12 @@ def updatePlayerRankPoints2(
         steamid32,
         style,
     )
+    xquery = insertQuery(sql)
 
     if xquery < 1:
         return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+            content={"updated": xquery, "xtime": time.perf_counter() - tic},
         )
 
     # Prepare the response
@@ -192,10 +194,10 @@ def updatePlayerRankPoints2(
     print(f"Execution time {toc - tic:0.4f}")
     # output = ResponseInsertQuery(xquery)
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
 
-@router.post(
+@router.put(
     "surftimer/updatePlayerRank",
     name="Update Player Rank Points 2",
     tags=["SurfTimer", "ck_playerrank"],
@@ -211,17 +213,18 @@ def updatePlayerRank(
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = surftimer.queries.sql_updatePlayerRank.format(
+    sql = surftimer.queries.sql_updatePlayerRank.format(
         finishedmaps,
         finishedmapspro,
         steamid32,
         style,
     )
+    xquery = insertQuery(sql)
 
     if xquery < 1:
         return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+            content={"updated": xquery, "xtime": time.perf_counter() - tic},
         )
 
     # Prepare the response
@@ -229,7 +232,7 @@ def updatePlayerRank(
     print(f"Execution time {toc - tic:0.4f}")
     # output = ResponseInsertQuery(xquery)
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
 
 @router.get(
@@ -247,13 +250,10 @@ def selectPlayerName(
     append_request_log(request)
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(f"selectPlayerName_{steamid32}")
-    if cached_data:
-        # Return cached data
-        # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'selectPlayerName_{steamid32}' ({time.perf_counter() - tic:0.4f}s)"
-        )
+    cache_key = f"selectPlayerName_{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -272,15 +272,12 @@ def selectPlayerName(
     xquery["xtime"] = time.perf_counter() - tic
 
     # Cache the data in Redis
-    redis_client.set(
-        f"selectPlayerName_{steamid32}",
-        json.dumps(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
+    set_cache(cache_key, xquery)
+
     return xquery
 
 
-@router.post(
+@router.put(
     "surftimer/updateLastSeenMySQL",
     name="Update Last Seen",
     tags=["SurfTimer", "ck_playerrank"],
@@ -293,12 +290,13 @@ def updateLastSeen(
     tic = time.perf_counter()
     append_request_log(request)
 
-    xquery = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
+    sql = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
+    xquery = insertQuery(sql)
 
     if xquery < 1:
         return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+            content={"updated": xquery, "xtime": time.perf_counter() - tic},
         )
 
     # Prepare the response
@@ -306,7 +304,7 @@ def updateLastSeen(
     print(f"Execution time {toc - tic:0.4f}")
     # output = ResponseInsertQuery(xquery)
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
 
 @router.get(
@@ -324,13 +322,10 @@ def selectTopPlayers(
     append_request_log(request)
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(f"selectTopPlayers_{style}")
-    if cached_data:
-        # Return cached data
-        # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'selectTopPlayers_{style}' ({time.perf_counter() - tic:0.4f}s)"
-        )
+    cache_key = f"selectTopPlayers_{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -346,14 +341,10 @@ def selectTopPlayers(
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    # xquery["xtime"] = time.perf_counter() - tic
 
     # Cache the data in Redis
-    redis_client.set(
-        f"selectTopPlayers_{style}",
-        json.dumps(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
+    set_cache(cache_key, xquery)
+
     return xquery
 
 
@@ -373,13 +364,10 @@ def selectRankedPlayersRank(
     append_request_log(request)
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(f"selectTopPlayers_{style}_{steamid32}")
-    if cached_data:
-        # Return cached data
-        # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'selectTopPlayers_{style}_{steamid32}' ({time.perf_counter() - tic:0.4f}s)"
-        )
+    cache_key = f"selectTopPlayers_{style}_{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -387,7 +375,6 @@ def selectRankedPlayersRank(
     xquery = selectQuery(
         surftimer.queries.sql_selectRankedPlayersRank.format(style, steamid32, style)
     )
-    print(surftimer.queries.sql_selectRankedPlayersRank.format(style, steamid32, style))
 
     if xquery:
         xquery = xquery
@@ -400,11 +387,8 @@ def selectRankedPlayersRank(
 
     print(f"Execution time {toc - tic:0.4f}")
     # Cache the data in Redis
-    redis_client.set(
-        f"selectTopPlayers_{style}_{steamid32}",
-        json.dumps(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
+    set_cache(cache_key, xquery)
+
     return xquery
 
 
@@ -419,13 +403,10 @@ def selectRankedPlayers(request: Request, response: Response):
     append_request_log(request)
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(f"selectRankedPlayers")
-    if cached_data:
-        # Return cached data
-        # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'selectRankedPlayers' ({time.perf_counter() - tic:0.4f}s)"
-        )
+    cache_key = f"selectRankedPlayers"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -443,12 +424,10 @@ def selectRankedPlayers(request: Request, response: Response):
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
+
     # Cache the data in Redis
-    redis_client.set(
-        f"selectRankedPlayers",
-        json.dumps(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
+    set_cache(cache_key, xquery)
+
     return xquery
 
 
@@ -467,6 +446,14 @@ def countRankedPlayers(
     tic = time.perf_counter()
     append_request_log(request)
 
+    cache_key = f"countRankedPlayers:{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
     xquery = selectQuery(surftimer.queries.sql_CountRankedPlayers.format(style))
 
     if xquery:
@@ -478,7 +465,9 @@ def countRankedPlayers(
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    xquery["xtime"] = time.perf_counter() - tic
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
     return xquery
 
 
@@ -497,6 +486,13 @@ def countRankedPlayers2(
     tic = time.perf_counter()
     append_request_log(request)
 
+    cache_key = f"countRankedPlayers2:{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
     xquery = selectQuery(surftimer.queries.sql_CountRankedPlayers2.format(style))
 
     if xquery:
@@ -508,7 +504,10 @@ def countRankedPlayers2(
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    xquery["xtime"] = time.perf_counter() - tic
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
     return xquery
 
 
@@ -528,13 +527,10 @@ def selectPlayerProfile(
     append_request_log(request)
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(f"selectTopPlayers_{steamid32}_{style}")
-    if cached_data:
-        # Return cached data
-        # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'selectTopPlayers_{steamid32}_{style}' ({time.perf_counter() - tic:0.4f}s)"
-        )
+    cache_key = f"selectTopPlayers_{steamid32}_{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -546,19 +542,15 @@ def selectPlayerProfile(
     if xquery:
         xquery = xquery.pop()
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {"steamid32": steamid32}
+        xquery = {"steamid32": steamid32, "style": style}
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=xquery)
 
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    xquery["xtime"] = time.perf_counter() - tic
+    # xquery["xtime"] = time.perf_counter() - tic
 
     # Cache the data in Redis
-    redis_client.set(
-        f"selectTopPlayers_{steamid32}_{style}",
-        json.dumps(xquery),
-        ex=config["REDIS"]["EXPIRY"],
-    )
-    return xquery
+    set_cache(cache_key, xquery)
 
+    return xquery
