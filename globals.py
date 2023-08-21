@@ -69,12 +69,20 @@ def get_cache(cache_key: str):
 
 
 def json_decimal(obj):
-    """Convert all instances of `Decimal` to `String`\n
-    `"runtime": 14.7363` > `"runtime": "14.736300"`\n
+    """Convert all instances of `Decimal` to `String`
+    `"runtime": 14.7363` > `"runtime": "14.736300"`
     `"runtime": 11.25` > `"runtime": "11.250000"`"""
     if isinstance(obj, Decimal):
         return str(obj)
-    raise TypeError
+    elif isinstance(obj, list):
+        for i in range(len(obj)):
+            if isinstance(obj[i], dict):
+                for key, value in obj[i].items():
+                    if isinstance(value, Decimal):
+                        obj[i][key] = str(value)
+        return obj
+    # If it's neither a Decimal nor a list of dictionaries, return it as is
+    return obj
 
 
 
