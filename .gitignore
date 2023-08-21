@@ -6,3 +6,4 @@ denied.json
 config.json
 auth_test.py
 start.sh
+change_author.sh
