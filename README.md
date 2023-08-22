@@ -10,7 +10,7 @@ SurfTimer FastAPI
 ### To Do
 - [ ] ck_announcements
 - [x] ck_bonus
-- [ ] ck_checkpoints
+- [x] ck_checkpoints
 - [x] ck_latestrecords
 - [x] ck_maptier
 - [x] ck_playeroptions2

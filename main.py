@@ -28,6 +28,7 @@ from surftimer.ck_maptier import router as ck_maptier_router
 from surftimer.ck_playerrank import router as ck_playerrank_router
 from surftimer.ck_playeroptions2 import router as ck_playeroptions2_router
 from surftimer.ck_bonus import router as ck_bonus_router
+from surftimer.ck_checkpoints import router as ck_checkpoints_router
 
 
 # Responses
@@ -65,8 +66,6 @@ app = FastAPI(
     # docs_url=None,
 )
 
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-# templates = Jinja2Templates(directory="templates")
 
 @app.get("/docs2", include_in_schema=False)
 async def custom_swagger_ui_html_cdn():
@@ -86,6 +85,7 @@ app.include_router(ck_maptier_router)
 app.include_router(ck_playerrank_router)
 app.include_router(ck_playeroptions2_router)
 app.include_router(ck_bonus_router)
+app.include_router(ck_checkpoints_router)
 
 
 @app.middleware("http")
