@@ -29,6 +29,7 @@ from surftimer.ck_playerrank import router as ck_playerrank_router
 from surftimer.ck_playeroptions2 import router as ck_playeroptions2_router
 from surftimer.ck_bonus import router as ck_bonus_router
 from surftimer.ck_checkpoints import router as ck_checkpoints_router
+from surftimer.ck_playertemp import router as ck_playertemp_router
 
 
 # Responses
@@ -56,6 +57,7 @@ swagger_config = {
     "syntaxHighlight.theme": "obsidian",
     "docExpansion": "none",
     "pluginLoadType": "chain",
+    "tagsSorter": "alpha",
 }
 app = FastAPI(
     title="SurfTimer API",
@@ -86,6 +88,7 @@ app.include_router(ck_playerrank_router)
 app.include_router(ck_playeroptions2_router)
 app.include_router(ck_bonus_router)
 app.include_router(ck_checkpoints_router)
+app.include_router(ck_playertemp_router)
 
 
 @app.middleware("http")

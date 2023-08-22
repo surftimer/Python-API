@@ -198,7 +198,7 @@ async def selectRecordCheckpoints(
     name="Delete Checkpoint",
     tags=["ck_checkpoints"],
 )
-def deleteCheckpoints(
+async def deleteCheckpoints(
     request: Request,
     response: Response,
     mapname: str,
