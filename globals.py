@@ -15,6 +15,10 @@ with open("config.json", "r") as f:
 with open("requests.json") as fp:
     log = json.load(fp)
 
+# Denied Log
+with open("denied.json") as fd:
+    denied = json.load(fd)
+
 
 # Initiate Redis connection
 redis_client = redis.Redis(
@@ -41,6 +45,22 @@ def append_request_log(request: Request):
     )
     with open("requests.json", "w") as json_file:
         json.dump(log, json_file, indent=4, separators=(",", ": "))
+
+
+def append_denied_log(request: Request):
+    """Logs some general info about the denied request recieved in `denied.json`"""
+    denied.append(
+        {
+            "url": str(request.url),
+            "ip": request.client.host,
+            "method": request.method,
+            "cookies": request.cookies,
+            "headers": dict(request.headers),
+            "time": str(datetime.now()),
+        }
+    )
+    with open("denied.json", "w") as json_file:
+        json.dump(denied, json_file, indent=4, separators=(",", ": "))
 
 
 def set_cache(cache_key: str, data):

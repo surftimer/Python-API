@@ -3,6 +3,8 @@ from datetime import datetime
 import json, time
 from fastapi import FastAPI, Request, status, Depends, Response
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware import Middleware
 from auth import VerifyToken
 from threading import Thread  # Not used yet
 
@@ -17,10 +19,10 @@ from globals import (
     redis_client,
     WHITELISTED_IPS,
     append_request_log,
+    append_denied_log,
 )
 
 from sql import selectQuery, insertQuery
-import surftimer.queries  # Containing all SurfTimer queries from `queries.sp`
 
 # Import all the endpoints for each table
 from surftimer.ck_latestrecords import router as ck_latestrecords_router
@@ -44,11 +46,28 @@ class ResponseInsertQuery:
         return {"inserted": self.inserted}
 
 
-# Swagger UI configuration
+class IPValidatorMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Get client IP
+        ip = str(request.client.host)
+
+        # Check if IP is allowed
+        if ip not in WHITELISTED_IPS:
+            append_denied_log(request)
+            data = {"message": "Not Allowed", "ip": ip}
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=data)
+
+        append_request_log(request)
+        # Proceed if IP is allowed
+        return await call_next(request)
+
+
+# Swagger UI configuration - https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
 swagger_config = {
     "displayOperationId": False,  # Show operationId on the UI
     "defaultModelsExpandDepth": 1,  # The default expansion depth for models (set to -1 completely hide the models)
     "defaultModelExpandDepth": 2,
+    "defaultModelRendering": "example",
     "deepLinking": True,  # Enables deep linking for tags and operations
     "useUnsafeMarkdown": True,
     "displayRequestDuration": True,
@@ -65,20 +84,8 @@ app = FastAPI(
     version="0.0.0",
     debug=True,
     swagger_ui_parameters=swagger_config,
-    # docs_url=None,
+    middleware=[Middleware(IPValidatorMiddleware)],
 )
-
-
-@app.get("/docs2", include_in_schema=False)
-async def custom_swagger_ui_html_cdn():
-    return get_swagger_ui_html(
-        openapi_url=app.openapi_url,
-        title=f"{app.title} - Swagger UI",
-        # swagger_ui_dark.css CDN link
-        swagger_css_url="https://cdn.jsdelivr.net/gh/Itz-fork/Fastapi-Swagger-UI-Dark/assets/swagger_ui_dark.min.css",
-        # swagger_css_url="https://raw.clarityeu.com/theme-newspaper.css",
-        swagger_ui_parameters=swagger_config,
-    )
 
 
 # Attach the routes
@@ -91,18 +98,15 @@ app.include_router(ck_checkpoints_router)
 app.include_router(ck_playertemp_router)
 
 
-@app.middleware("http")
-async def validate_ip(request: Request, call_next):
-    # Get client IP
-    ip = str(request.client.host)
-
-    # Check if IP is allowed
-    if ip not in WHITELISTED_IPS:
-        data = {"message": f"IP {ip} is not allowed to access this resource."}
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=data)
-
-    # Proceed if IP is allowed
-    return await call_next(request)
+@app.get("/docs2", include_in_schema=False)
+async def custom_swagger_ui_html_cdn():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - Swagger UI",
+        # swagger_ui_dark.css CDN link
+        swagger_css_url="https://cdn.jsdelivr.net/gh/Itz-fork/Fastapi-Swagger-UI-Dark/assets/swagger_ui_dark.min.css",
+        swagger_ui_parameters=swagger_config,
+    )
 
 
 @app.get("/")
@@ -140,20 +144,15 @@ async def mapchooser(
     ```"""
     tic = time.perf_counter()
 
-    append_request_log(request)
-
     json_data = []
 
     # Check if data is cached in Redis
-    cached_data = redis_client.get(
-        f"mapchooser_{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}"
-    )
+    cache_key = f"mapchooser:{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}"
+    cached_data = redis_client.get(cache_key)
     if cached_data:
         # Return cached data
         # print(json.loads(cached_data))
-        print(
-            f"[Redis] Loaded 'mapchooser_{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}' ({time.perf_counter() - tic:0.4f}s)"
-        )
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
@@ -255,45 +254,12 @@ async def mapchooser(
 
     # Cache the data in Redis
     redis_client.set(
-        f"mapchooser_{type}_{tier_min}_{tier_max}_{tier}_{steamid}_{style}",
+        cache_key,
         json.dumps(json_data),
         ex=config["REDIS"]["EXPIRY"],
     )
 
     return json_data
-
-
-#     request: Request,
-#     response: Response,
-#     steamid32: str,
-#     name: str,
-#     runtime: float,
-#     mapname: str,
-# ):
-#     """Inserts a new record to the table\n
-#     ```char sql_insertLatestRecords[] = ....```"""
-#     tic = time.perf_counter()
-#     append_request_log(request)
-
-#     sql = surftimer.queries.sql_insertLatestRecords.format(
-#         steamid32, name, runtime, mapname
-#     )
-#     # xquery = insertQuery(sql)
-#     xquery = 0
-#     # time.sleep(3)
-
-#     if xquery < 1:
-#         JSONResponse(
-#             status_code=status.HTTP_204_NO_CONTENT,
-#             content={"inserted": xquery, "xtime": time.perf_counter() - tic},
-#         )
-
-#     # Prepare the response
-#     toc = time.perf_counter()
-#     print(f"Execution time {toc - tic:0.4f}")
-#     # output = ResponseInsertQuery(xquery)
-
-#     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
 
 # new code 👇
