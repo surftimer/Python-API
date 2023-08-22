@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import append_request_log, get_cache, set_cache
+from globals import get_cache, set_cache
 from pydantic import BaseModel
 import time, json, surftimer.queries
 
@@ -59,7 +59,6 @@ async def insertPlayerOptions(request: Request, response: Response, steamid32: s
     char[] sql_insertPlayerOptions = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(surftimer.queries.sql_insertPlayerOptions.format(steamid32))
 
@@ -72,7 +71,6 @@ async def insertPlayerOptions(request: Request, response: Response, steamid32: s
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
@@ -85,10 +83,9 @@ async def insertPlayerOptions(request: Request, response: Response, steamid32: s
 async def selectPlayerOptions(request: Request, response: Response, steamid32: str):
     """`char[] sql_selectPlayerOptions = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
-    cache_key = f"selectPlayerOptions_{steamid32}"
+    cache_key = f"selectPlayerOptions:{steamid32}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -119,12 +116,13 @@ async def selectPlayerOptions(request: Request, response: Response, steamid32: s
     name="Update Player Options",
     tags=["ck_playeroptions2"],
 )
-async def updatePlayerOptions(request: Request, response: Response, data: PlayerOptions):
+async def updatePlayerOptions(
+    request: Request, response: Response, data: PlayerOptions
+):
     """```c
     char[] sql_updatePlayerOptions = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(
         surftimer.queries.sql_updatePlayerOptions.format(
@@ -176,6 +174,5 @@ async def updatePlayerOptions(request: Request, response: Response, data: Player
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}

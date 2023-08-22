@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import redis_client, config, append_request_log, get_cache, set_cache
+from globals import get_cache, set_cache
 import time, json
 import surftimer.queries
 
@@ -21,10 +21,9 @@ async def selectMapTier(
 ):
     """`char[] sql_selectMapTier = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
-    cache_key = f"selectMapTier_{mapname}"
+    cache_key = f"selectMapTier:{mapname}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -49,7 +48,7 @@ async def selectMapTier(
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    
+
     return xquery
 
 
@@ -68,7 +67,6 @@ async def insertMapTier(
     char[] sql_insertmaptier = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(surftimer.queries.sql_insertmaptier.format(mapname, tier))
 
@@ -81,7 +79,6 @@ async def insertMapTier(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
@@ -101,7 +98,6 @@ async def updateMapTier(
     char[] sql_updatemaptier = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(surftimer.queries.sql_updatemaptier.format(tier, mapname))
 
@@ -114,7 +110,6 @@ async def updateMapTier(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
@@ -134,7 +129,6 @@ async def updateMapperName(
     char[] sql_updateMapperName = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(surftimer.queries.sql_updateMapperName.format(mapper, mapname))
 
@@ -147,6 +141,5 @@ async def updateMapperName(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}

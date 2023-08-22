@@ -3,9 +3,6 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sql import selectQuery, insertQuery
 from globals import (
-    redis_client,
-    config,
-    append_request_log,
     set_cache,
     get_cache,
 )
@@ -48,7 +45,6 @@ def insertBonus(
     """Inserts a new record to the table\n
     ```char sql_insertLatestRecords[] = ....```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_insertBonus.format(
         data.steamid32,
@@ -73,7 +69,6 @@ def insertBonus(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
@@ -90,7 +85,6 @@ def updateBonus(
 ):
     """```char sql_updateBonus[] = ....```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_updateBonus.format(
         data.runtime,
@@ -127,10 +121,8 @@ def selectBonusCount(request: Request, response: Response, mapname: str):
     ```char sql_selectBonusCount[] = ....```"""
     tic = time.perf_counter()
 
-    append_request_log(request)
-
     # Check if data is cached in Redis
-    cache_key = f"selectBonusCount_{mapname}"
+    cache_key = f"selectBonusCount:{mapname}"
     cached_data = get_cache(cache_key)
     if cached_data:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -165,8 +157,6 @@ def selectPersonalBonusRecords(
 ):
     """```char sql_selectPersonalBonusRecords[] = ....```"""
     tic = time.perf_counter()
-
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectPersonalBonusRecords:{steamid32}-{mapname}"
@@ -211,7 +201,6 @@ def selectPlayerRankBonus(
     """```char sql_selectPlayerRankBonus[] = ....```"""
     tic = time.perf_counter()
 
-    append_request_log(request)
     cache_key = (
         f"selectPlayerRankBonus:{data.steamid32}-{data.mapname}-{data.zonegroup}"
     )
@@ -262,8 +251,6 @@ def selectFastestBonus(
     """```char sql_selectFastestBonus[] = ....```"""
     tic = time.perf_counter()
 
-    append_request_log(request)
-
     # Check if data is cached in Redis
     cache_key = f"selectFastestBonus:{mapname}"
     cached_data = get_cache(cache_key)
@@ -302,8 +289,6 @@ def selectAllBonusTimesinMap(
 ):
     """```char sql_selectAllBonusTimesinMap[] = ....```"""
     tic = time.perf_counter()
-
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectAllBonusTimesinMap:{mapname}"
@@ -345,8 +330,6 @@ def selectTopBonusSurfers(
 ):
     """```char sql_selectTopBonusSurfers[] = ....```"""
     tic = time.perf_counter()
-
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectTopBonusSurfers:{mapname}-{style}-{zonegroup}"
@@ -393,8 +376,6 @@ def deleteBonus(
 ):
     """```char sql_deleteBonus[] = ....```"""
     tic = time.perf_counter()
-
-    append_request_log(request)
 
     xquery = insertQuery(surftimer.queries.sql_deleteBonus.format(mapname))
 

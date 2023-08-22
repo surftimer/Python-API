@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import append_request_log, get_cache, set_cache
+from globals import get_cache, set_cache
 from pydantic import BaseModel
 import time, json, surftimer.queries
 
@@ -31,7 +31,6 @@ async def insertOrUpdateCheckpoints(
     data: PlayerCheckpoints,
 ):
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_InsertOrUpdateCheckpoints.format(
         data.steamid,
@@ -56,7 +55,6 @@ async def insertOrUpdateCheckpoints(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
@@ -71,7 +69,6 @@ async def selectCheckpoints(
 ):
     """`char[] sql_selectCheckpoints = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectCheckpoints:{mapname}-{steamid32}"
@@ -117,7 +114,6 @@ async def selectCheckpointsinZoneGroup(
 ):
     """`char[] sql_selectCheckpointsinZoneGroup = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectCheckpointsinZoneGroup:{mapname}-{steamid32}-{zonegroup}"
@@ -160,7 +156,6 @@ async def selectRecordCheckpoints(
 ):
     """`char[] sql_selectRecordCheckpoints = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectRecordCheckpoints:{steamid32}-{mapname}-{mapname}"
@@ -206,8 +201,6 @@ async def deleteCheckpoints(
     """```char sql_deleteCheckpoints[] = ....```"""
     tic = time.perf_counter()
 
-    append_request_log(request)
-
     xquery = insertQuery(surftimer.queries.sql_deleteCheckpoints.format(mapname))
 
     if xquery <= 0:
@@ -232,7 +225,6 @@ async def selectStageTimes(
 ):
     """`char[] sql_selectStageTimes = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectStageTimes:-{mapname}-{steamid32}"
@@ -273,7 +265,6 @@ async def selectStageAttempts(
 ):
     """`char[] sql_selectStageAttempts = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectStageAttempts:-{mapname}-{steamid32}"

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import append_request_log, get_cache, set_cache
+from globals import get_cache, set_cache
 import time, json
 import surftimer.queries
 
@@ -18,8 +18,6 @@ async def selectLatestRecord(request: Request, response: Response):
     """Retrieves the last 50 records\n
     ```char sql_selectLatestRecords[] = ....```"""
     tic = time.perf_counter()
-
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectLatestRecord"
@@ -65,7 +63,6 @@ async def insertLatestRecord(
     """Inserts a new record to the table\n
     ```char sql_insertLatestRecords[] = ....```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_insertLatestRecords.format(
         steamid32, name, runtime, mapname

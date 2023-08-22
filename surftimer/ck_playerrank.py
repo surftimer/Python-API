@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import append_request_log, get_cache, set_cache
+from globals import get_cache, set_cache
 from pydantic import BaseModel
 import time, json
 import surftimer.queries
+
 
 class UpdatePlayerPoints(BaseModel):
     name: str
@@ -31,7 +32,6 @@ class UpdatePlayerPoints(BaseModel):
     style: int
 
 
-
 router = APIRouter()
 
 
@@ -54,7 +54,6 @@ async def insertPlayerRank(
     style,
 ):
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_insertPlayerRank.format(
         steamid32,
@@ -77,7 +76,6 @@ async def insertPlayerRank(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
@@ -93,7 +91,6 @@ async def updatePlayerRankPoints(
     data: UpdatePlayerPoints,
 ):
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_updatePlayerRankPoints.format(
         data.name,
@@ -127,7 +124,6 @@ async def updatePlayerRankPoints(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
@@ -143,7 +139,6 @@ async def updatePlayerRankPoints2(
     data: UpdatePlayerPoints,
 ):
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_updatePlayerRankPoints2.format(
         data.name,
@@ -180,7 +175,6 @@ async def updatePlayerRankPoints2(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
@@ -199,7 +193,6 @@ async def updatePlayerRank(
     style: str,
 ):
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_updatePlayerRank.format(
         finishedmaps,
@@ -218,7 +211,6 @@ async def updatePlayerRank(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
@@ -235,10 +227,9 @@ async def selectPlayerName(
 ):
     """`char[] sql_selectPlayerName = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
-    cache_key = f"selectPlayerName_{steamid32}"
+    cache_key = f"selectPlayerName:{steamid32}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -276,7 +267,6 @@ async def updateLastSeen(
     steamid32: str,
 ):
     tic = time.perf_counter()
-    append_request_log(request)
 
     sql = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
     xquery = insertQuery(sql)
@@ -290,7 +280,6 @@ async def updateLastSeen(
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
@@ -307,10 +296,9 @@ async def selectTopPlayers(
 ):
     """`char[] sql_selectTopPlayers = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
-    cache_key = f"selectTopPlayers_{style}"
+    cache_key = f"selectTopPlayers:{style}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -349,10 +337,9 @@ async def selectRankedPlayersRank(
 ):
     """`char[] sql_selectRankedPlayersRank = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
-    cache_key = f"selectTopPlayers_{style}_{steamid32}"
+    cache_key = f"selectTopPlayers:{style}_{steamid32}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -388,7 +375,6 @@ async def selectRankedPlayersRank(
 async def selectRankedPlayers(request: Request, response: Response):
     """`char[] sql_selectRankedPlayers = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectRankedPlayers"
@@ -432,7 +418,6 @@ async def countRankedPlayers(
     """This is technically not ***Ranked*** players, it's all `steamid` count in `ck_playerrank`\n
     `char[] sql_CountRankedPlayers = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     cache_key = f"countRankedPlayers:{style}"
     cached_data = get_cache(cache_key)
@@ -472,7 +457,6 @@ async def countRankedPlayers2(
     """This ***DOES*** check for player points being higher than 0\n
     `char[] sql_CountRankedPlayers2 = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     cache_key = f"countRankedPlayers2:{style}"
     cached_data = get_cache(cache_key)
@@ -512,10 +496,9 @@ async def selectPlayerProfile(
 ):
     """`char[] sql_selectPlayerProfile = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
-    cache_key = f"selectTopPlayers_{steamid32}_{style}"
+    cache_key = f"selectTopPlayers:{steamid32}_{style}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -536,7 +519,6 @@ async def selectPlayerProfile(
     toc = time.perf_counter()
 
     print(f"Execution time {toc - tic:0.4f}")
-    # xquery["xtime"] = time.perf_counter() - tic
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
-from globals import append_request_log, get_cache, set_cache
+from globals import get_cache, set_cache
 from pydantic import BaseModel
 import time, json, surftimer.queries
 
@@ -35,7 +35,6 @@ async def insertPlayerTmp(request: Request, response: Response, data: PlayerTemp
     char[] sql_insertPlayerTmp = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(
         surftimer.queries.sql_insertPlayerTmp.format(
@@ -63,7 +62,6 @@ async def insertPlayerTmp(request: Request, response: Response, data: PlayerTemp
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"inserted": xquery, "xtime": time.perf_counter() - tic}
 
@@ -78,7 +76,6 @@ async def updatePlayerTmp(request: Request, response: Response, data: PlayerTemp
     char[] sql_updatePlayerOptions = ....
     ```"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     xquery = insertQuery(
         surftimer.queries.sql_updatePlayerTmp.format(
@@ -106,7 +103,6 @@ async def updatePlayerTmp(request: Request, response: Response, data: PlayerTemp
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    # output = ResponseInsertQuery(xquery)
 
     return {"updated": xquery, "xtime": time.perf_counter() - tic}
 
@@ -123,8 +119,6 @@ async def deletePlayerTmp(
 ):
     """```char sql_deletePlayerTmp[] = ....```"""
     tic = time.perf_counter()
-
-    append_request_log(request)
 
     xquery = insertQuery(surftimer.queries.sql_deletePlayerTmp.format(steamid32))
 
@@ -150,7 +144,6 @@ async def selectPlayerTmp(
 ):
     """`char[] sql_selectPlayerTmp = ....`"""
     tic = time.perf_counter()
-    append_request_log(request)
 
     # Check if data is cached in Redis
     cache_key = f"selectPlayerTmp:{steamid32}-{mapname}"
