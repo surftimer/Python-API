@@ -73,7 +73,7 @@ swagger_config = {
     "displayRequestDuration": True,
     "filter": True,
     "showExtensions": True,
-    "syntaxHighlight.theme": "obsidian",
+    "syntaxHighlight.theme": "arta",
     "docExpansion": "none",
     "pluginLoadType": "chain",
     "tagsSorter": "alpha",
