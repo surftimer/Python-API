@@ -65,7 +65,11 @@ def append_denied_log(request: Request):
 
 def set_cache(cache_key: str, data):
     """Cache the data in Redis\n
-    `Decimal` values are converted to `String`"""
+    `Decimal` values are converted to `String`\n
+    ### Still returns `True` if Redis functionality is disabled"""
+    if config["REDIS"]["ENABLED"] == 0:
+        return True
+
     redis_client.set(
         cache_key,
         json.dumps(data, default=json_decimal),
@@ -76,7 +80,11 @@ def set_cache(cache_key: str, data):
 
 
 def get_cache(cache_key: str):
-    """Try and get cached data from Redis"""
+    """Try and get cached data from Redis\n
+    ### Still returns `None` if Redis functionality is disabled"""
+    if config["REDIS"]["ENABLED"] == 0:
+        return None
+
     cached_data = redis_client.get(cache_key)
     if cached_data:
         # Return cached data

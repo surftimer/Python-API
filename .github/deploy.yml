@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+  check_run:
+    types: [requested_action, rerequested]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  #on:
+  #  push:
+  #    branches:
+  #      - main
+
+jobs:
+  workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Upload files
+        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        env:
+          FTP_SERVER: ${{ secrets.SFTP_HOST }}
+          FTP_USERNAME: ${{ secrets.SFTP_USER }}
+          FTP_PASSWORD: ${{ secrets.SFTP_PASS }}
+          LOCAL_DIR: ./
+          REMOTE_DIR: ./
+          METHOD: sftp
+          PORT: ${{ secrets.SFTP_PORT }}
+          ARGS: --no-empty-dirs
+
+      - name: Stop the Pterodactyl server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "stop" }'
+
+      - name: Kill the Pterodactyl server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "kill" }'
+
+      - name: Start the Pterodactyl server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "start" }'
