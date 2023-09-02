@@ -25,7 +25,7 @@ jobs:
           FTP_USERNAME: ${{ secrets.SFTP_USER }}
           FTP_PASSWORD: ${{ secrets.SFTP_PASS }}
           LOCAL_DIR: ./
-          REMOTE_DIR: ./
+          REMOTE_DIR: /
           METHOD: sftp
           PORT: ${{ secrets.SFTP_PORT }}
           ARGS: --no-empty-dirs
