@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
 import time, json
@@ -7,6 +8,12 @@ import surftimer.queries
 
 router = APIRouter()
 
+
+class LatestRec(BaseModel):
+    steamid32: str
+    name: str
+    runtime: float
+    mapname: str
 
 # ck_latestrecords
 @router.get(
@@ -55,17 +62,14 @@ async def selectLatestRecord(request: Request, response: Response):
 async def insertLatestRecord(
     request: Request,
     response: Response,
-    steamid32: str,
-    name: str,
-    runtime: float,
-    mapname: str,
+    data: LatestRec
 ):
     """Inserts a new record to the table\n
     ```char sql_insertLatestRecords[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_insertLatestRecords.format(
-        steamid32, name, runtime, mapname
+        data.steamid32, data.name, data.runtime, data.mapname
     )
     xquery = insertQuery(sql)
     # xquery = 0
