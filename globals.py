@@ -1,4 +1,5 @@
-import json, redis, time
+import redis, time
+import simplejson as json
 from decimal import Decimal
 from fastapi.security import HTTPBearer
 from fastapi import Request
@@ -72,7 +73,7 @@ def set_cache(cache_key: str, data):
 
     redis_client.set(
         cache_key,
-        json.dumps(data, default=json_decimal),
+        json.dumps(data, use_decimal=True, encoding='utf-8', ensure_ascii=False, default=default_serializer, allow_nan=True),
         ex=config["REDIS"]["EXPIRY"],
     )
 
@@ -92,6 +93,39 @@ def get_cache(cache_key: str):
         return cached_data
     else:
         return None
+
+def ordinal(n):
+    suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    if 11 <= (n % 100) <= 13:
+        suffix = 'th'
+    return str(n) + suffix
+
+def custom_date_format(dt):
+    day = ordinal(dt.day)
+    month = dt.strftime('%B')
+    year = dt.year
+    time = dt.strftime('%H:%M:%S')
+    return f"{day} of {month} {year}, {time}"
+
+def custom_time_format(time_value):
+    # Convert to Decimal for precise arithmetic
+    time_value = Decimal(time_value)
+
+    # Calculate minutes and remaining seconds
+    minutes = int(time_value // 60)
+    seconds = time_value % 60
+
+    # Format the time
+    formatted_time = f"{minutes}:{seconds:06.4f}" if minutes > 0 else f"{seconds:.4f}"
+
+    return formatted_time
+
+def default_serializer(obj):
+    if isinstance(obj, datetime):
+        return custom_date_format(obj)
+    elif isinstance(obj, Decimal):
+        return custom_time_format(obj)
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
 def json_decimal(obj):
