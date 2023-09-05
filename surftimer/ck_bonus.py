@@ -1,19 +1,21 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from decimal import Decimal
+import simplejson as json
 from sql import selectQuery, insertQuery
 from globals import (
     set_cache,
     get_cache,
 )
-import time, json, surftimer.queries
+import time, surftimer.queries
 
 
 class NewBonus(BaseModel):
     steamid32: str
     name: str
     mapname: str
-    runtime: int
+    runtime: Decimal
     zonegroup: int
     velStartXY: int
     velStartXYZ: int
@@ -42,8 +44,8 @@ def insertBonus(
     response: Response,
     data: NewBonus,
 ):
-    """Inserts a new record to the table\n
-    ```char sql_insertLatestRecords[] = ....```"""
+    """Inserts a new `Bonus` record to the table\n
+    ```char sql_insertBonus[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_insertBonus.format(
@@ -127,7 +129,7 @@ def selectBonusCount(request: Request, response: Response, mapname: str):
     if cached_data:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(surftimer.queries.sql_selectBonusCount.format(mapname))
@@ -166,7 +168,7 @@ def selectPersonalBonusRecords(
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
 
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
@@ -210,7 +212,7 @@ def selectPlayerRankBonus(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
@@ -257,7 +259,7 @@ def selectFastestBonus(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(surftimer.queries.sql_selectFastestBonus.format(mapname))
@@ -296,7 +298,7 @@ def selectAllBonusTimesinMap(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(surftimer.queries.sql_selectAllBonusTimesinMap.format(mapname))
@@ -337,7 +339,7 @@ def selectTopBonusSurfers(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(

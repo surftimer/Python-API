@@ -3,14 +3,16 @@ from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
 from pydantic import BaseModel
-import time, json, surftimer.queries
+from decimal import Decimal
+import simplejson as json
+import time, surftimer.queries
 
 
 class PlayerCheckpoints(BaseModel):
     steamid: str
     mapname: str
     cp: int
-    time: str
+    time: Decimal
     stage_time: str
     stage_attempts: int
     zonegroup: int
@@ -76,7 +78,7 @@ async def selectCheckpoints(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
@@ -121,7 +123,7 @@ async def selectCheckpointsinZoneGroup(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
@@ -163,7 +165,7 @@ async def selectRecordCheckpoints(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
@@ -212,7 +214,7 @@ async def deleteCheckpoints(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"deleted": xquery, "xtime": time.perf_counter() - tic}
 
 
 @router.get(
@@ -232,7 +234,7 @@ async def selectStageTimes(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
@@ -272,7 +274,7 @@ async def selectStageAttempts(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
         )
 
     xquery = selectQuery(
