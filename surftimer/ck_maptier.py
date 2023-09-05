@@ -4,9 +4,14 @@ from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
 import time, json
 import surftimer.queries
+from pydantic import BaseModel
 
 router = APIRouter()
 
+class MaptierModel(BaseModel):
+    mapname: str
+    tier: int = None
+    mappername: str = None
 
 # ck_maptier
 @router.get(
@@ -60,15 +65,14 @@ async def selectMapTier(
 async def insertMapTier(
     request: Request,
     response: Response,
-    mapname: str,
-    tier: int,
+    data: MaptierModel,
 ):
     """```c
     char[] sql_insertmaptier = ....
     ```"""
     tic = time.perf_counter()
 
-    xquery = insertQuery(surftimer.queries.sql_insertmaptier.format(mapname, tier))
+    xquery = insertQuery(surftimer.queries.sql_insertmaptier.format(data.mapname, data.tier))
 
     if xquery < 1:
         return JSONResponse(
@@ -91,15 +95,14 @@ async def insertMapTier(
 async def updateMapTier(
     request: Request,
     response: Response,
-    mapname: str,
-    tier: int,
+    data: MaptierModel,
 ):
     """```c
     char[] sql_updatemaptier = ....
     ```"""
     tic = time.perf_counter()
 
-    xquery = insertQuery(surftimer.queries.sql_updatemaptier.format(tier, mapname))
+    xquery = insertQuery(surftimer.queries.sql_updatemaptier.format(data.tier, data.mapname))
 
     if xquery < 1:
         return JSONResponse(
@@ -122,24 +125,23 @@ async def updateMapTier(
 async def updateMapperName(
     request: Request,
     response: Response,
-    mapper: str,
-    mapname: int,
+    data: MaptierModel,
 ):
     """```c
     char[] sql_updateMapperName = ....
     ```"""
     tic = time.perf_counter()
 
-    xquery = insertQuery(surftimer.queries.sql_updateMapperName.format(mapper, mapname))
+    xquery = insertQuery(surftimer.queries.sql_updateMapperName.format(data.mappername, data.mapname))
 
     if xquery < 1:
         return JSONResponse(
             status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
+            content={"updated": xquery, "xtime": time.perf_counter() - tic},
         )
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"updated": xquery, "xtime": time.perf_counter() - tic}
