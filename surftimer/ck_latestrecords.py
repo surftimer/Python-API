@@ -2,9 +2,11 @@ from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sql import selectQuery, insertQuery
-from globals import get_cache, set_cache
-import time, json
+from globals import get_cache, set_cache, default_serializer
+import time
+import simplejson as json
 import surftimer.queries
+from decimal import Decimal
 
 router = APIRouter()
 
@@ -12,7 +14,7 @@ router = APIRouter()
 class LatestRec(BaseModel):
     steamid32: str
     name: str
-    runtime: float
+    runtime: Decimal
     mapname: str
 
 # ck_latestrecords

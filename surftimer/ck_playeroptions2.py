@@ -3,7 +3,8 @@ from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
 from pydantic import BaseModel
-import time, json, surftimer.queries
+import time, surftimer.queries
+import simplejson as json
 
 
 router = APIRouter()
@@ -90,7 +91,7 @@ async def selectPlayerOptions(request: Request, response: Response, steamid32: s
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, allow_nan=True)
         )
 
     xquery = selectQuery(surftimer.queries.sql_selectPlayerOptions.format(steamid32))
@@ -99,7 +100,7 @@ async def selectPlayerOptions(request: Request, response: Response, steamid32: s
         xquery = xquery.pop()
     else:
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=json.loads(cached_data)
+            status_code=status.HTTP_404_NOT_FOUND, content=json.loads(cached_data, allow_nan=True)
         )
 
     # Cache the data in Redis
