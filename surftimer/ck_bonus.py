@@ -63,17 +63,17 @@ def insertBonus(
     # time.sleep(3)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_201_CREATED
+    return response
 
 @router.put(
     "/surftimer/updateBonus",
@@ -101,17 +101,17 @@ def updateBonus(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response
 
 @router.get(
     "/surftimer/selectBonusCount",
@@ -384,13 +384,14 @@ def deleteBonus(
 
     xquery = insertQuery(surftimer.queries.sql_deleteBonus.format(mapname))
 
-    if xquery <= 0:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"xtime": time.perf_counter() - tic},
-        )
+    if xquery < 1:
+        response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response

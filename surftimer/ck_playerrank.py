@@ -68,17 +68,17 @@ async def insertPlayerRank(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_201_CREATED
+    return response
 
 @router.put(
     "surftimer/updatePlayerRankPoints",
@@ -116,17 +116,17 @@ async def updatePlayerRankPoints(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"updated": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"updated": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response
 
 @router.put(
     "surftimer/updatePlayerRankPoints2",
@@ -167,17 +167,17 @@ async def updatePlayerRankPoints2(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"updated": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"updated": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response
 
 @router.put(
     "surftimer/updatePlayerRank",
@@ -203,17 +203,17 @@ async def updatePlayerRank(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"updated": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"updated": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response
 
 @router.get(
     "/surftimer/selectPlayerName",
@@ -272,17 +272,17 @@ async def updateLastSeen(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"updated": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"updated": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response
 
 @router.get(
     "/surftimer/selectTopPlayers",

@@ -64,17 +64,17 @@ async def insertPlayerOptions(request: Request, response: Response, steamid32: s
     xquery = insertQuery(surftimer.queries.sql_insertPlayerOptions.format(steamid32))
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_201_CREATED
+    return response
 
 @router.get(
     "/surftimer/selectPlayerOptions",
@@ -165,13 +165,14 @@ async def updatePlayerOptions(
     )
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"updated": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response

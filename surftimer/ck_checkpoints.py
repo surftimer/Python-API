@@ -49,16 +49,17 @@ async def insertOrUpdateCheckpoints(
     xquery = insertQuery(sql)
 
     if xquery < 1:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content={"inserted": xquery, "xtime": time.perf_counter() - tic},
-        )
+        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    
+    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_201_CREATED
+    return response
 
 
 @router.get(
@@ -205,17 +206,17 @@ async def deleteCheckpoints(
 
     xquery = insertQuery(surftimer.queries.sql_deleteCheckpoints.format(mapname))
 
-    if xquery <= 0:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"xtime": time.perf_counter() - tic},
-        )
+    if xquery < 1:
+        response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"deleted": xquery, "xtime": time.perf_counter() - tic}
-
+    response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    response.status_code = status.HTTP_200_OK
+    return response
 
 @router.get(
     "/surftimer/selectStageTimes",
