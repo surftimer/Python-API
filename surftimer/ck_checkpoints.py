@@ -47,9 +47,10 @@ async def insertOrUpdateCheckpoints(
         data.stage_attempts,
     )
     xquery = insertQuery(sql)
-
+    content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    
     if xquery < 1:
-        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -57,7 +58,7 @@ async def insertOrUpdateCheckpoints(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
     
-    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -206,15 +207,16 @@ async def deleteCheckpoints(
 
     xquery = insertQuery(surftimer.queries.sql_deleteCheckpoints.format(mapname))
 
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 

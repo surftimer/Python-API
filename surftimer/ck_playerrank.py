@@ -66,9 +66,10 @@ async def insertPlayerRank(
         style,
     )
     xquery = insertQuery(sql)
-
+    
+    content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -76,7 +77,7 @@ async def insertPlayerRank(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -115,8 +116,9 @@ async def updatePlayerRankPoints(
     )
     xquery = insertQuery(sql)
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -124,7 +126,7 @@ async def updatePlayerRankPoints(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -166,8 +168,9 @@ async def updatePlayerRankPoints2(
     )
     xquery = insertQuery(sql)
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -175,7 +178,7 @@ async def updatePlayerRankPoints2(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -202,8 +205,9 @@ async def updatePlayerRank(
     )
     xquery = insertQuery(sql)
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -211,7 +215,7 @@ async def updatePlayerRank(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -271,8 +275,9 @@ async def updateLastSeen(
     sql = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
     xquery = insertQuery(sql)
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -280,7 +285,7 @@ async def updateLastSeen(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 

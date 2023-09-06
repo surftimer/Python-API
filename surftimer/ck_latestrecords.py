@@ -76,9 +76,10 @@ async def insertLatestRecord(
     xquery = insertQuery(sql)
     # xquery = 0
     # time.sleep(3)
-
+    
+    content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -86,6 +87,6 @@ async def insertLatestRecord(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
     return response

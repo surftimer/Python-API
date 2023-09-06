@@ -62,8 +62,9 @@ def insertBonus(
     # xquery = 0
     # time.sleep(3)
 
+    content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -71,7 +72,7 @@ def insertBonus(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -100,8 +101,9 @@ def updateBonus(
     )
     xquery = insertQuery(sql)
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -109,7 +111,7 @@ def updateBonus(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -384,14 +386,15 @@ def deleteBonus(
 
     xquery = insertQuery(surftimer.queries.sql_deleteBonus.format(mapname))
 
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response

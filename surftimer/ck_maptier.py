@@ -73,9 +73,10 @@ async def insertMapTier(
     tic = time.perf_counter()
 
     xquery = insertQuery(surftimer.queries.sql_insertmaptier.format(data.mapname, data.tier))
-
+    
+    content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -83,7 +84,7 @@ async def insertMapTier(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
     
-    response.body = {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -105,8 +106,9 @@ async def updateMapTier(
 
     xquery = insertQuery(surftimer.queries.sql_updatemaptier.format(data.tier, data.mapname))
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -114,7 +116,7 @@ async def updateMapTier(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -135,8 +137,9 @@ async def updateMapperName(
 
     xquery = insertQuery(surftimer.queries.sql_updateMapperName.format(data.mappername, data.mapname))
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+        response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -144,6 +147,6 @@ async def updateMapperName(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_200_OK
     return response
