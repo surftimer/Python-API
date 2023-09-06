@@ -135,10 +135,11 @@ def selectBonusCount(request: Request, response: Response, mapname: str):
     xquery = selectQuery(surftimer.queries.sql_selectBonusCount.format(mapname))
 
     if len(xquery) <= 0:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"xtime": time.perf_counter() - tic},
-        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        # return JSONResponse(
+        #     status_code=status.HTTP_404_NOT_FOUND,
+        #     content={"xtime": time.perf_counter() - tic},
+        # )
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
