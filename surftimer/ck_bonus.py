@@ -198,13 +198,15 @@ def selectPersonalBonusRecords(
 def selectPlayerRankBonus(
     request: Request,
     response: Response,
-    data: PlayerRankBonus,
+    steamid32: str,
+    mapname: str,
+    zonegroup: int,
 ):
     """```char sql_selectPlayerRankBonus[] = ....```"""
     tic = time.perf_counter()
 
     cache_key = (
-        f"selectPlayerRankBonus:{data.steamid32}-{data.mapname}-{data.zonegroup}"
+        f"selectPlayerRankBonus:{steamid32}-{mapname}-{zonegroup}"
     )
 
     # # Check if data is cached in Redis
@@ -217,11 +219,11 @@ def selectPlayerRankBonus(
 
     xquery = selectQuery(
         surftimer.queries.sql_selectPlayerRankBonus.format(
-            data.steamid32,
-            data.mapname,
-            data.zonegroup,
-            data.mapname,
-            data.zonegroup,
+            steamid32,
+            mapname,
+            zonegroup,
+            mapname,
+            zonegroup,
         )
     )
 
@@ -390,4 +392,4 @@ def deleteBonus(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    return {"inserted": xquery, "xtime": time.perf_counter() - tic}
+    return {"deleted": xquery, "xtime": time.perf_counter() - tic}

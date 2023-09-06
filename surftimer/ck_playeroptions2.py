@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Response, status
+from fastapi import APIRouter, Request, Response, status, HTTPException
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
@@ -99,9 +99,7 @@ async def selectPlayerOptions(request: Request, response: Response, steamid32: s
     if xquery:
         xquery = xquery.pop()
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=json.loads(cached_data, allow_nan=True)
-        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
