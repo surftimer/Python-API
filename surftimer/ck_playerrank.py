@@ -37,7 +37,7 @@ router = APIRouter()
 
 # ck_playerrank
 @router.post(
-    "surftimer/insertPlayerRank",
+    "/surftimer/insertPlayerRank",
     name="Add Player Rank",
     tags=["ck_playerrank"],
 )
@@ -70,7 +70,9 @@ async def insertPlayerRank(
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
+        response.headers['content-type'] = 'application/json'
         return response
 
     # Prepare the response
@@ -79,10 +81,11 @@ async def insertPlayerRank(
 
     response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
+    response.headers['content-type'] = 'application/json'
     return response
 
 @router.put(
-    "surftimer/updatePlayerRankPoints",
+    "/surftimer/updatePlayerRankPoints",
     name="Update Player Rank Points 1",
     tags=["ck_playerrank"],
 )
@@ -119,6 +122,7 @@ async def updatePlayerRankPoints(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -127,11 +131,12 @@ async def updatePlayerRankPoints(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
 
 @router.put(
-    "surftimer/updatePlayerRankPoints2",
+    "/surftimer/updatePlayerRankPoints2",
     name="Update Player Rank Points 2",
     tags=["ck_playerrank"],
 )
@@ -171,6 +176,7 @@ async def updatePlayerRankPoints2(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -179,11 +185,12 @@ async def updatePlayerRankPoints2(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
 
 @router.put(
-    "surftimer/updatePlayerRank",
+    "/surftimer/updatePlayerRank",
     name="Update Player Rank",
     tags=["ck_playerrank"],
 )
@@ -208,6 +215,7 @@ async def updatePlayerRank(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -216,6 +224,7 @@ async def updatePlayerRank(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -261,7 +270,7 @@ async def selectPlayerName(
 
 
 @router.put(
-    "surftimer/updateLastSeenMySQL",
+    "/surftimer/updateLastSeenMySQL",
     name="Update Last Seen",
     tags=["ck_playerrank"],
 )
@@ -278,6 +287,7 @@ async def updateLastSeen(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -286,6 +296,7 @@ async def updateLastSeen(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
 

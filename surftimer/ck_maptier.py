@@ -77,6 +77,7 @@ async def insertMapTier(
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -109,6 +110,7 @@ async def updateMapTier(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -117,6 +119,7 @@ async def updateMapTier(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -140,6 +143,7 @@ async def updateMapperName(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -148,5 +152,6 @@ async def updateMapperName(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response

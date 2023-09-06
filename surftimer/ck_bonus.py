@@ -66,6 +66,7 @@ def insertBonus(
     if xquery < 1:
         response.body = response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
+        response.headers['content-type'] = 'application/json'
         return response
 
     # Prepare the response
@@ -74,6 +75,7 @@ def insertBonus(
 
     response.body = response.body = json.dumps(content_data).encode('utf-8')
     response.status_code = status.HTTP_201_CREATED
+    response.headers['content-type'] = 'application/json'
     return response
 
 @router.put(
@@ -104,6 +106,7 @@ def updateBonus(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -112,6 +115,7 @@ def updateBonus(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
 
@@ -389,6 +393,7 @@ def deleteBonus(
     content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -396,5 +401,6 @@ def deleteBonus(
     print(f"Execution time {toc - tic:0.4f}")
 
     response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
