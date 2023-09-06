@@ -164,9 +164,8 @@ async def updatePlayerOptions(
             data.steamid32,
         )
     )
-    print('xquery',xquery)
-    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
 
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         response.body = json.dumps(content_data).encode('utf-8')
         response.status_code = status.HTTP_304_NOT_MODIFIED
