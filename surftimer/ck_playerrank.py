@@ -9,7 +9,7 @@ import surftimer.queries
 
 class UpdatePlayerPoints(BaseModel):
     name: str
-    points: str
+    points: int
     wrpoints: int
     wrbpoints: int
     wrcppoints: int
@@ -17,7 +17,7 @@ class UpdatePlayerPoints(BaseModel):
     groupspoints: int
     mappoints: int
     bonuspoints: int
-    finishedmapspro: str
+    finishedmapspro: int
     finishedbonuses: int
     finishedstages: int
     wrs: int
@@ -32,6 +32,16 @@ class UpdatePlayerPoints(BaseModel):
     style: int
 
 
+class InsertPlayerModel(BaseModel):
+    steamid32: str
+    steamid64: int
+    name: str
+    country: str
+    countryCode: str
+    continentCode: str
+    joined: int
+    style: int
+
 router = APIRouter()
 
 
@@ -44,26 +54,20 @@ router = APIRouter()
 async def insertPlayerRank(
     request: Request,
     response: Response,
-    steamid32,
-    steamid64,
-    name,
-    country,
-    countryCode,
-    continentCode,
-    joined,
-    style,
+    data: InsertPlayerModel,
 ):
+    """```char sql_insertPlayerRank[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_insertPlayerRank.format(
-        steamid32,
-        steamid64,
-        name,
-        country,
-        countryCode,
-        continentCode,
-        joined,
-        style,
+        data.steamid32,
+        data.steamid64,
+        data.name,
+        data.country,
+        data.countryCode,
+        data.continentCode,
+        data.joined,
+        data.style,
     )
     xquery = insertQuery(sql)
     
@@ -94,6 +98,7 @@ async def updatePlayerRankPoints(
     response: Response,
     data: UpdatePlayerPoints,
 ):
+    """```char sql_updatePlayerRankPoints[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_updatePlayerRankPoints.format(
@@ -145,6 +150,7 @@ async def updatePlayerRankPoints2(
     response: Response,
     data: UpdatePlayerPoints,
 ):
+    """```char sql_updatePlayerRankPoints2[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_updatePlayerRankPoints2.format(
@@ -202,6 +208,7 @@ async def updatePlayerRank(
     steamid32: str,
     style: str,
 ):
+    """```char sql_updatePlayerRank[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_updatePlayerRank.format(
@@ -279,6 +286,7 @@ async def updateLastSeen(
     response: Response,
     steamid32: str,
 ):
+    """```char sql_UpdateLastSeenMySQL[] = ....```"""
     tic = time.perf_counter()
 
     sql = surftimer.queries.sql_UpdateLastSeenMySQL.format(steamid32)
@@ -351,7 +359,8 @@ async def selectRankedPlayersRank(
     style: int,
     steamid32: str,
 ):
-    """`char[] sql_selectRankedPlayersRank = ....`"""
+    """`char[] sql_selectRankedPlayersRank = ....`\n
+    Done 2/4 query executions in ST code for this T_T"""
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
@@ -530,6 +539,47 @@ async def selectPlayerProfile(
         xquery = xquery.pop()
     else:
         xquery = {"steamid32": steamid32, "style": style}
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+@router.get(
+    "/surftimer/selectUnknownPlayerProfile",
+    name="Select Unknown Player Profile",
+    tags=["ck_playerrank"],
+)
+async def selectUnknownPlayerProfile(
+    request: Request,
+    response: Response,
+    name: str,
+):
+    """`SELECT steamid, name, points FROM ck_playerrank WHERE name LIKE '%c%s%c' ORDER BY points DESC LIMIT 0, 1;`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectUnknownPlayerProfile:{name}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
+    xquery = selectQuery(
+        surftimer.queries.sql_selectPlayerRankUnknown.format(name)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        xquery = {"name": name}
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=xquery)
 
     toc = time.perf_counter()

@@ -62,7 +62,7 @@ sql_selectPlayerName = "SELECT name FROM ck_playerrank where steamid = '{}'"
 sql_UpdateLastSeenMySQL = (
     "UPDATE ck_playerrank SET lastseen = UNIX_TIMESTAMP() where steamid = '{}';"
 )
-
+sql_selectPlayerRankUnknown = "SELECT `steamid`, `name`, `points` FROM `ck_playerrank` WHERE `name` LIKE '%{}%' ORDER BY `points` DESC LIMIT 0, 1;"
 sql_selectTopPlayers = "SELECT name, points, finishedmapspro, steamid FROM ck_playerrank WHERE style = {} ORDER BY points DESC LIMIT 100"
 sql_selectRankedPlayer = "SELECT steamid, name, points, finishedmapspro, country, lastseen, timealive, timespec, connections, readchangelog, style, countryCode, continentCode from ck_playerrank where steamid='{}';"
 sql_selectRankedPlayersRank = "SELECT name FROM ck_playerrank WHERE style = {} AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '{}' AND style = {}) ORDER BY points;"
