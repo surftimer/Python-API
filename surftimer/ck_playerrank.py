@@ -73,10 +73,9 @@ async def insertPlayerRank(
     
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
-        response.headers['content-type'] = 'application/json'
         return response
 
     # Prepare the response
@@ -126,7 +125,7 @@ async def updatePlayerRankPoints(
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
@@ -181,7 +180,7 @@ async def updatePlayerRankPoints2(
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
@@ -221,7 +220,7 @@ async def updatePlayerRank(
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
@@ -294,7 +293,7 @@ async def updateLastSeen(
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
@@ -646,7 +645,7 @@ async def updatePlayerConnections(
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response

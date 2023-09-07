@@ -79,7 +79,7 @@ async def insertLatestRecord(
     
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
-        response.body = json.dumps(content_data).encode('utf-8')
+        # response.body = json.dumps(content_data).encode('utf-8')
         response.headers['content-type'] = 'application/json'
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
