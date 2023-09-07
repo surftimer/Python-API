@@ -429,6 +429,43 @@ async def selectRankedPlayers(request: Request, response: Response):
 
     return xquery
 
+@router.get(
+    "/surftimer/selectRankedPlayer",
+    name="Select Ranked Players",
+    tags=["ck_playerrank"],
+)
+async def selectRankedPlayer(request: Request, response: Response, steamid32: str):
+    """`char[] sql_selectRankedPlayer = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectRankedPlayer"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
+        )
+
+    xquery = selectQuery(surftimer.queries.sql_selectRankedPlayer.format(steamid32))
+    # xquery = []
+
+    if len(xquery) > 0:
+        xquery = xquery
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        xquery = {}
+        xquery["xtime"] = time.perf_counter() - tic
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
 
 @router.get(
     "/surftimer/countRankedPlayers",
@@ -590,3 +627,36 @@ async def selectUnknownPlayerProfile(
     set_cache(cache_key, xquery)
 
     return xquery
+
+@router.put(
+    "/surftimer/updatePlayerConnections",
+    name="Update Player Connections",
+    tags=["ck_playerrank"],
+)
+async def updatePlayerConnections(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """```UPDATE ck_playerrank SET connections = connections + 1 WHERE steamid = '%s';```"""
+    tic = time.perf_counter()
+
+    sql = surftimer.queries.sql_updatePlayerConnections.format(steamid32)
+    xquery = insertQuery(sql)
+
+    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
+    if xquery < 1:
+        response.body = json.dumps(content_data).encode('utf-8')
+        response.headers['content-type'] = 'application/json'
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
+
+    # Prepare the response
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    response.body = json.dumps(content_data).encode('utf-8')
+    response.headers['content-type'] = 'application/json'
+    response.status_code = status.HTTP_200_OK
+    return response
+
