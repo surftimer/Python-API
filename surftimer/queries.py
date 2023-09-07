@@ -19,6 +19,9 @@ sql_selectAllBonusTimesinMap = (
     "SELECT zonegroup, runtime from ck_bonus WHERE mapname = '{}';"
 )
 sql_selectTopBonusSurfers = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ck_bonus as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '{}' AND db2.style = {} AND db1.style = {} AND db2.runtime > -1.0 AND zonegroup = {} ORDER BY overall ASC LIMIT 100;"
+sql_stray_selectPlayerSpecificBonusData = "SELECT `steamid`, `name`, `mapname`, `runtime`, zonegroup FROM `ck_bonus` WHERE `steamid` = '{}' AND `mapname` LIKE '%{}%' AND zonegroup = {} AND style = 0 LIMIT 1;"
+sql_stray_selectTotalBonusCompletes = "SELECT count(name) FROM `ck_bonus` WHERE `mapname` = '{}' AND zonegroup = {} AND style = 0 AND runtime > 0.0;"
+sql_stray_selectPlayersBonusRank = "SELECT name,mapname FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {} AND style = 0 AND runtime > -1.0) AND mapname = '{}' AND zonegroup = {} AND runtime > -1.0 ORDER BY runtime;"
 
 ## ck_checkpoints
 sql_createCheckpoints = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;"

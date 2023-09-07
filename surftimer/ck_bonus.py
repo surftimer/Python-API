@@ -404,3 +404,144 @@ def deleteBonus(
     response.headers['content-type'] = 'application/json'
     response.status_code = status.HTTP_200_OK
     return response
+
+
+## Stray queries scattered in SurfTimer code
+@router.get(
+    "/surftimer/selectPlayerSpecificBonusData",
+    name="Get Player Specific Bonus Data",
+    tags=["ck_bonus", "strays"],
+)
+def selectPlayerSpecificBonusData(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    mapname: str,
+    zonegroup: int,
+):
+    """```char sql_stray_selectPlayerSpecificBonusData[] = ....```"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectPlayerSpecificBonusData:{steamid32}-{mapname}-{zonegroup}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+        )
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_selectPlayerSpecificBonusData.format(
+            steamid32,
+            mapname,
+            zonegroup,
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code=status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/selectTotalBonusCompletesCount",
+    name="Get Count Bonus Finished",
+    tags=["ck_bonus", "strays"],
+)
+def selectTotalBonusCompletesCount(
+    request: Request,
+    response: Response,
+    mapname: str,
+    zonegroup: int,
+):
+    """```char sql_stray_selectTotalBonusCompletes[] = ....```"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectTotalBonusCompletesCount:{mapname}-{zonegroup}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+        )
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_selectTotalBonusCompletes.format(
+            mapname,
+            zonegroup,
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code=status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+@router.get(
+    "/surftimer/selectPlayersBonusRank",
+    name="Get Player Bonus Rank",
+    tags=["ck_bonus", "strays"],
+)
+def selectPlayersBonusRank(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    mapname: str,
+    zonegroup: int,
+):
+    """```char sql_stray_selectPlayersBonusRank[] = ....```"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectPlayersBonusRank:{steamid32}-{mapname}-{zonegroup}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+        )
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_selectPlayersBonusRank.format(
+            steamid32,
+            mapname,
+            zonegroup,
+            mapname,
+            zonegroup
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code=status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
