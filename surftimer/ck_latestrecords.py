@@ -90,3 +90,36 @@ async def insertLatestRecord(request: Request, response: Response, data: LatestR
     response.body = json.dumps(content_data).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
+
+
+@router.delete(
+    "/surftimer/deleteWipePlayerLatestRecords",
+    name="Wipe Player Latest Records",
+    tags=["ck_latestrecords", "strays"],
+)
+async def deleteWipePlayerLatestRecords(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """```char sql_stray_deleteWipePlayerLatestRecords[] = ....```"""
+    tic = time.perf_counter()
+
+    xquery = insertQuery(
+        surftimer.queries.sql_stray_deleteWipePlayerLatestRecords.format(steamid32)
+    )
+
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    if xquery < 1:
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
+    response.status_code = status.HTTP_200_OK
+    return response

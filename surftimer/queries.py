@@ -206,3 +206,8 @@ sql_stray_deleteWipePlayerCheckpoints = (
 )
 sql_stray_selectCPR = "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;"
 sql_stray_ccp_getPlayerPR = "SELECT db1.steamid, db1.mapname, db1.cp, db1.stage_time, db1.stage_attempts, (SELECT count(name)+1 FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND stage_time > -1.0 AND runtimepro <= db1.stage_time) AS `rank`, (SELECT count(name) FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND runtimepro > -1.0) AS total FROM ck_checkpoints db1 WHERE db1.mapname = '%s' AND db1.steamid = '%s' AND db1.stage_time > -1.0  ORDER BY cp ASC;"
+
+# latestrecords
+sql_stray_deleteWipePlayerLatestRecords = (
+    "DELETE FROM ck_latestrecords WHERE steamid = '%s';"
+)
