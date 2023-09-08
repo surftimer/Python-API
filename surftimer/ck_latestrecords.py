@@ -12,10 +12,13 @@ router = APIRouter()
 
 
 class LatestRec(BaseModel):
+    """Body for adding or updating **latest record** entries"""
+
     steamid32: str
     name: str
     runtime: Decimal
     mapname: str
+
 
 # ck_latestrecords
 @router.get(
@@ -61,11 +64,7 @@ async def selectLatestRecord(request: Request, response: Response):
     name="Add Latest Record",
     tags=["ck_latestrecords"],
 )
-async def insertLatestRecord(
-    request: Request,
-    response: Response,
-    data: LatestRec
-):
+async def insertLatestRecord(request: Request, response: Response, data: LatestRec):
     """Inserts a new record to the table\n
     ```char sql_insertLatestRecords[] = ....```"""
     tic = time.perf_counter()
@@ -76,11 +75,11 @@ async def insertLatestRecord(
     xquery = insertQuery(sql)
     # xquery = 0
     # time.sleep(3)
-    
+
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -88,6 +87,6 @@ async def insertLatestRecord(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
+    response.body = json.dumps(content_data).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response

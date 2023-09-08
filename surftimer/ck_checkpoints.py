@@ -9,6 +9,8 @@ import time, surftimer.queries
 
 
 class PlayerCheckpoints(BaseModel):
+    """Body for adding or updating **Checkpoint** time"""
+
     steamid: str
     mapname: str
     cp: int
@@ -48,18 +50,18 @@ async def insertOrUpdateCheckpoints(
     )
     xquery = insertQuery(sql)
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
-    
+
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
     # Prepare the response
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
-    
-    response.body = json.dumps(content_data).encode('utf-8')
+
+    response.body = json.dumps(content_data).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -81,7 +83,8 @@ async def selectCheckpoints(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+            status_code=status.HTTP_200_OK,
+            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
         )
 
     xquery = selectQuery(
@@ -126,7 +129,8 @@ async def selectCheckpointsinZoneGroup(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+            status_code=status.HTTP_200_OK,
+            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
         )
 
     xquery = selectQuery(
@@ -168,7 +172,8 @@ async def selectRecordCheckpoints(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+            status_code=status.HTTP_200_OK,
+            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
         )
 
     xquery = selectQuery(
@@ -211,17 +216,18 @@ async def deleteCheckpoints(
     content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
 
 @router.get(
     "/surftimer/selectStageTimes",
@@ -240,7 +246,8 @@ async def selectStageTimes(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+            status_code=status.HTTP_200_OK,
+            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
         )
 
     xquery = selectQuery(
@@ -280,7 +287,8 @@ async def selectStageAttempts(
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data, use_decimal=True, parse_nan=True)
+            status_code=status.HTTP_200_OK,
+            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
         )
 
     xquery = selectQuery(

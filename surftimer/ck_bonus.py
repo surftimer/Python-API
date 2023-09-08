@@ -12,6 +12,8 @@ import time, surftimer.queries
 
 
 class NewBonus(BaseModel):
+    """Body for adding a new **Bonus** time"""
+
     steamid32: str
     name: str
     mapname: str
@@ -20,14 +22,6 @@ class NewBonus(BaseModel):
     velStartXY: int
     velStartXYZ: int
     velStartZ: int
-
-
-class PlayerRankBonus(BaseModel):
-    """To be used for `selectPlayerRankBonus` endpoint"""
-
-    steamid32: str
-    mapname: str
-    zonegroup: int
 
 
 router = APIRouter()

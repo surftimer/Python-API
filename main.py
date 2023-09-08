@@ -17,6 +17,7 @@ from globals import (
     token_auth_scheme,
     config,
     redis_client,
+    tags_metadata,
     WHITELISTED_IPS,
     append_request_log,
     append_denied_log,
@@ -32,18 +33,6 @@ from surftimer.ck_playeroptions2 import router as ck_playeroptions2_router
 from surftimer.ck_bonus import router as ck_bonus_router
 from surftimer.ck_checkpoints import router as ck_checkpoints_router
 from surftimer.ck_playertemp import router as ck_playertemp_router
-
-
-# Responses
-class ResponseInsertQuery:
-    """This is to be used for all `INSERT` queries if possible"""
-
-    def __init__(self, inserted):
-        self.inserted = inserted
-
-    def to_dict(self):
-        """Makes it readable for `print()`"""
-        return {"inserted": self.inserted}
 
 
 class IPValidatorMiddleware(BaseHTTPMiddleware):
@@ -85,6 +74,7 @@ app = FastAPI(
     debug=True,
     swagger_ui_parameters=swagger_config,
     middleware=[Middleware(IPValidatorMiddleware)],
+    openapi_tags=tags_metadata,
 )
 
 
@@ -109,7 +99,7 @@ async def custom_swagger_ui_html_cdn():
     )
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 async def home():
     data = {"message": "Suuuuh duuuud"}
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)

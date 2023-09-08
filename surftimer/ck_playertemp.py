@@ -10,6 +10,8 @@ router = APIRouter()
 
 
 class PlayerTemp(BaseModel):
+    """Body for adding **player temp** data - restoring location"""
+
     cords1: str
     cords2: str
     cords3: str

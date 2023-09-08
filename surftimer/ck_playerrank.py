@@ -8,6 +8,8 @@ import surftimer.queries
 
 
 class UpdatePlayerPoints(BaseModel):
+    """Body for updating **player rank** entry"""
+
     name: str
     points: int
     wrpoints: int
@@ -33,6 +35,8 @@ class UpdatePlayerPoints(BaseModel):
 
 
 class InsertPlayerModel(BaseModel):
+    """Body for adding a **player rank** entry"""
+
     steamid32: str
     steamid64: int
     name: str
@@ -41,6 +45,7 @@ class InsertPlayerModel(BaseModel):
     continentCode: str
     joined: int
     style: int
+
 
 router = APIRouter()
 
@@ -70,11 +75,11 @@ async def insertPlayerRank(
         data.style,
     )
     xquery = insertQuery(sql)
-    
+
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -82,10 +87,11 @@ async def insertPlayerRank(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
+    response.body = json.dumps(content_data).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
-    response.headers['content-type'] = 'application/json'
+    response.headers["content-type"] = "application/json"
     return response
+
 
 @router.put(
     "/surftimer/updatePlayerRankPoints",
@@ -126,7 +132,7 @@ async def updatePlayerRankPoints(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -134,10 +140,11 @@ async def updatePlayerRankPoints(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
 
 @router.put(
     "/surftimer/updatePlayerRankPoints2",
@@ -181,7 +188,7 @@ async def updatePlayerRankPoints2(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -189,10 +196,11 @@ async def updatePlayerRankPoints2(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
 
 @router.put(
     "/surftimer/updatePlayerRank",
@@ -221,7 +229,7 @@ async def updatePlayerRank(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -229,10 +237,11 @@ async def updatePlayerRank(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
 
 @router.get(
     "/surftimer/selectPlayerName",
@@ -294,7 +303,7 @@ async def updateLastSeen(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -302,10 +311,11 @@ async def updateLastSeen(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
 
 @router.get(
     "/surftimer/selectTopPlayers",
@@ -427,6 +437,7 @@ async def selectRankedPlayers(request: Request, response: Response):
     set_cache(cache_key, xquery)
 
     return xquery
+
 
 @router.get(
     "/surftimer/selectRankedPlayer",
@@ -586,6 +597,7 @@ async def selectPlayerProfile(
 
     return xquery
 
+
 @router.get(
     "/surftimer/selectUnknownPlayerProfile",
     name="Select Unknown Player Profile",
@@ -608,9 +620,7 @@ async def selectUnknownPlayerProfile(
             status_code=status.HTTP_200_OK, content=json.loads(cached_data)
         )
 
-    xquery = selectQuery(
-        surftimer.queries.sql_selectPlayerRankUnknown.format(name)
-    )
+    xquery = selectQuery(surftimer.queries.sql_selectPlayerRankUnknown.format(name))
 
     if xquery:
         xquery = xquery.pop()
@@ -626,6 +636,7 @@ async def selectUnknownPlayerProfile(
     set_cache(cache_key, xquery)
 
     return xquery
+
 
 @router.put(
     "/surftimer/updatePlayerConnections",
@@ -646,7 +657,7 @@ async def updatePlayerConnections(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -654,8 +665,7 @@ async def updatePlayerConnections(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
-

@@ -28,6 +28,44 @@ redis_client = redis.Redis(
     password=config["REDIS"]["PASSWORD"],
 )
 
+tags_metadata = [
+    {
+        "name": "ck_bonus",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_checkpoints",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_latestrecords",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_maptier",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_playeroptions2",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_playerrank",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_playertemp",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "strays",
+        "description": "All queries that were NOT contained in `queries.sp` for each table",
+    },
+    {
+        "name": "Point Calculation",
+        "description": "Queries that are involved in **player points** calculation",
+    },
+]
 
 # Whitelisted IPs
 WHITELISTED_IPS = config["WHITELISTED_IPS"]
@@ -73,7 +111,14 @@ def set_cache(cache_key: str, data):
 
     redis_client.set(
         cache_key,
-        json.dumps(data, use_decimal=True, encoding='utf-8', ensure_ascii=False, default=default_serializer, allow_nan=True),
+        json.dumps(
+            data,
+            use_decimal=True,
+            encoding="utf-8",
+            ensure_ascii=False,
+            default=default_serializer,
+            allow_nan=True,
+        ),
         ex=config["REDIS"]["EXPIRY"],
     )
 
@@ -94,18 +139,21 @@ def get_cache(cache_key: str):
     else:
         return None
 
+
 def ordinal(n):
-    suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    suffix = ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]
     if 11 <= (n % 100) <= 13:
-        suffix = 'th'
+        suffix = "th"
     return str(n) + suffix
+
 
 def custom_date_format(dt):
     day = ordinal(dt.day)
-    month = dt.strftime('%B')
+    month = dt.strftime("%B")
     year = dt.year
-    time = dt.strftime('%H:%M:%S')
+    time = dt.strftime("%H:%M:%S")
     return f"{day} of {month} {year}, {time}"
+
 
 def custom_time_format(time_value):
     # Convert to Decimal for precise arithmetic
@@ -119,6 +167,7 @@ def custom_time_format(time_value):
     formatted_time = f"{minutes}:{seconds:06.4f}" if minutes > 0 else f"{seconds:.4f}"
 
     return formatted_time
+
 
 def default_serializer(obj):
     if isinstance(obj, datetime):

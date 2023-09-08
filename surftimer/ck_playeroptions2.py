@@ -11,6 +11,8 @@ router = APIRouter()
 
 
 class PlayerOptions(BaseModel):
+    """Body for updating **player options** entry"""
+
     timer: int
     hide: int
     sounds: int
@@ -66,7 +68,7 @@ async def insertPlayerOptions(request: Request, response: Response, steamid32: s
     content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
 
@@ -74,9 +76,10 @@ async def insertPlayerOptions(request: Request, response: Response, steamid32: s
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
+    response.body = json.dumps(content_data).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
+
 
 @router.get(
     "/surftimer/selectPlayerOptions",
@@ -93,7 +96,8 @@ async def selectPlayerOptions(request: Request, response: Response, steamid32: s
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data, allow_nan=True)
+            status_code=status.HTTP_200_OK,
+            content=json.loads(cached_data, allow_nan=True),
         )
 
     xquery = selectQuery(surftimer.queries.sql_selectPlayerOptions.format(steamid32))
@@ -169,7 +173,7 @@ async def updatePlayerOptions(
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
-        response.headers['content-type'] = 'application/json'
+        response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         # response.headers['content-type'] = 'application/json'
 
@@ -177,7 +181,7 @@ async def updatePlayerOptions(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode('utf-8')
-    response.headers['content-type'] = 'application/json'
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
