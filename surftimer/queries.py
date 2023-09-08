@@ -22,6 +22,21 @@ sql_selectTopBonusSurfers = "SELECT db2.steamid, db1.name, db2.runtime as overal
 sql_stray_selectPlayerSpecificBonusData = "SELECT `steamid`, `name`, `mapname`, `runtime`, zonegroup FROM `ck_bonus` WHERE `steamid` = '{}' AND `mapname` LIKE '%{}%' AND zonegroup = {} AND style = 0 LIMIT 1;"
 sql_stray_selectTotalBonusCompletes = "SELECT count(name) FROM `ck_bonus` WHERE `mapname` = '{}' AND zonegroup = {} AND style = 0 AND runtime > 0.0;"
 sql_stray_selectPlayersBonusRank = "SELECT name,mapname FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {} AND style = 0 AND runtime > -1.0) AND mapname = '{}' AND zonegroup = {} AND runtime > -1.0 ORDER BY runtime;"
+sql_stray_viewBonusRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = {} AND runtime < {} AND style = {};"
+sql_stray_deleteSpecificBonus = (
+    "DELETE FROM ck_bonus WHERE zonegroup = {} AND mapname = '{}';"
+)
+sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';"
+sql_stray_selectMapRankBonusStyle = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND style = {} AND runtime > 0.0 AND zonegroup = {}) AND mapname = '{}' AND style = {} AND zonegroup = {};"
+sql_stray_viewBonusStyleRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = '{}' AND style = '{}' AND runtime < {}"
+sql_stray_selectPersonalBonusStylesRecords = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND style = '{}' AND runtime > '0.0'"
+sql_stray_viewPRinfoMapRankBonusCallback = "SELECT COUNT(*), steamid FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname LIKE '%{}%' AND runtime > -1.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
+sql_stray_getRankSteamIdBonus = "SELECT steamid FROM ck_bonus WHERE mapname = '{}' AND style = 0 AND runtime > -1.0 AND zonegroup = '{}' ORDER BY runtime ASC LIMIT {}, 1;"
+sql_stray_deleteWipePlayerBonus = "DELETE FROM ck_bonus WHERE steamid = '{}';"
+sql_stray_pr_bonusInfo = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {};"
+## Player Points Calculation ##
+sql_stray_point_calc_countFinishedBonus = "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = {}) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = {}) as total FROM ck_bonus a WHERE steamid = '{}' AND style = {};"
+
 
 ## ck_checkpoints
 sql_createCheckpoints = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;"
@@ -75,7 +90,9 @@ sql_CountRankedPlayers2 = (
     "SELECT COUNT(steamid) FROM ck_playerrank where points > 0 AND style = {};"
 )
 sql_selectPlayerProfile = "SELECT steamid, steamid64, name, country, points, wrpoints, wrbpoints, wrcppoints, top10points, groupspoints, mappoints, bonuspoints, finishedmapspro, finishedbonuses, finishedstages, wrs, wrbs, wrcps, top10s, `groups`, lastseen, countryCode, continentCode FROM ck_playerrank WHERE steamid = '{}' AND style = '{}';"
-sql_updatePlayerConnections = "UPDATE ck_playerrank SET connections = connections + 1 WHERE steamid = '{}';"
+sql_updatePlayerConnections = (
+    "UPDATE ck_playerrank SET connections = connections + 1 WHERE steamid = '{}';"
+)
 
 ## ck_playertemp
 sql_createPlayertmp = "CREATE TABLE IF NOT EXISTS ck_playertemp (steamid VARCHAR(32), mapname VARCHAR(32), cords1 FLOAT NOT NULL DEFAULT '-1.0', cords2 FLOAT NOT NULL DEFAULT '-1.0', cords3 FLOAT NOT NULL DEFAULT '-1.0', angle1 FLOAT NOT NULL DEFAULT '-1.0',angle2 FLOAT NOT NULL DEFAULT '-1.0',angle3 FLOAT NOT NULL DEFAULT '-1.0', EncTickrate INT(12) DEFAULT '-1.0', runtimeTmp decimal(12,6) NOT NULL DEFAULT '-1.000000', Stage INT, zonegroup INT NOT NULL DEFAULT 0, PRIMARY KEY(steamid,mapname)) DEFAULT CHARSET=utf8mb4;"
