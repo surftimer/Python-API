@@ -65,6 +65,10 @@ tags_metadata = [
         "name": "Point Calculation",
         "description": "Queries that are involved in **player points** calculation",
     },
+    {
+        "name": "Wipe",
+        "description": "Wiping player related data",
+    },
 ]
 
 # Whitelisted IPs

@@ -309,7 +309,7 @@ async def selectStageAttempts(
 @router.delete(
     "/surftimer/deleteWipePlayerCheckpoints",
     name="Wipe Player Checkpoint",
-    tags=["ck_checkpoints", "strays"],
+    tags=["ck_checkpoints", "strays", "Wipe"],
 )
 async def deleteWipePlayerCheckpoints(
     request: Request,

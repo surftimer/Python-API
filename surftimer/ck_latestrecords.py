@@ -95,7 +95,7 @@ async def insertLatestRecord(request: Request, response: Response, data: LatestR
 @router.delete(
     "/surftimer/deleteWipePlayerLatestRecords",
     name="Wipe Player Latest Records",
-    tags=["ck_latestrecords", "strays"],
+    tags=["ck_latestrecords", "strays", "Wipe"],
 )
 async def deleteWipePlayerLatestRecords(
     request: Request,

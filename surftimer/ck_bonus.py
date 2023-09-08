@@ -919,7 +919,7 @@ def getRankSteamIdBonus(
 @router.delete(
     "/surftimer/deleteWipePlayerBonus",
     name="Wipe Player Bonus Times",
-    tags=["ck_bonus", "strays"],
+    tags=["ck_bonus", "strays", "Wipe"],
 )
 def deleteWipePlayerBonus(
     request: Request,
