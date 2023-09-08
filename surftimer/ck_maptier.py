@@ -36,20 +36,19 @@ async def selectMapTier(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_selectMapTier.format(mapname))
 
     if xquery:
         xquery = xquery.pop()
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"mapname": mapname, "xtime": time.perf_counter() - tic},
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
@@ -166,3 +165,222 @@ async def updateMapperName(
     response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
+
+@router.get(
+    "/surftimer/viewUnfinishedMaps",
+    name="View Player Unfinished Maps",
+    tags=["ck_maptier", "strays"],
+)
+async def viewUnfinishedMaps(
+    request: Request,
+    response: Response,
+    style: int,
+    steamid32: str,
+):
+    """`char[] sql_stray_viewUnfinishedMaps = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"viewUnfinishedMaps:{style}-{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_viewUnfinishedMaps.format(
+            style,
+            steamid32,
+            style,
+            steamid32,
+        )
+    )
+
+    if len(xquery) <= 0:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/selectMapImprovement",
+    name="View Map Total Finishes",
+    tags=["ck_maptier", "strays"],
+)
+async def selectMapImprovement(
+    request: Request,
+    response: Response,
+    mapname: str,
+):
+    """`char[] sql_stray_selectMapImprovement = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectMapImprovement:{mapname}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_selectMapImprovement.format(mapname)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/viewMapnamePr",
+    name="View Map Name",
+    tags=["ck_maptier", "strays"],
+)
+async def viewMapnamePr(
+    request: Request,
+    response: Response,
+    mapname: str,
+):
+    """`char[] sql_stray_viewMapnamePr = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"viewMapnamePr:{mapname}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_stray_viewMapnamePr.format(mapname))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/viewPlayerPrMapInfo",
+    name="View PR Map Info",
+    tags=["ck_maptier", "strays"],
+)
+async def viewPlayerPrMapInfo(
+    request: Request,
+    response: Response,
+    mapname: str,
+):
+    """`char[] sql_stray_viewPlayerPrMapInfo = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"viewPlayerPrMapInfo:{mapname}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_viewPlayerPrMapInfo.format(
+            mapname, mapname, mapname
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/selectMapcycle",
+    name="View Mapcycle",
+    tags=["ck_maptier", "strays"],
+)
+async def selectMapcycle(
+    request: Request,
+    response: Response,
+):
+    """`char[] sql_stray_selectMapcycle = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectMapcycle:"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_stray_selectMapcycle)
+
+    if len(xquery) <= 0:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery

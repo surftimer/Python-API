@@ -134,7 +134,7 @@ sql_selectzoneTypeIds = "SELECT zonetypeid FROM ck_zones WHERE mapname='{}' AND 
 sql_selectMapZones = "SELECT zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname, targetname, onejumplimit, prespeed FROM ck_zones WHERE mapname = '{}' ORDER BY zonetypeid ASC"
 sql_selectTotalBonusCount = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 3 GROUP BY mapname, zonegroup;"
 sql_selectZoneIds = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename, hookname, targetname, onejumplimit, prespeed FROM ck_zones WHERE mapname = '{}' ORDER BY zoneid ASC"
-sql_selectBonusesInMap = "SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c{}%c' AND zonegroup > 0 GROUP BY zonegroup;"
+sql_selectBonusesInMap = "SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%{}%' AND zonegroup > 0 GROUP BY zonegroup;"
 sql_deleteMapZones = "DELETE FROM ck_zones WHERE mapname = '{}'"
 sql_deleteZone = "DELETE FROM ck_zones WHERE mapname = '{}' AND zoneid = '{}'"
 sql_deleteZonesInGroup = (
@@ -177,13 +177,7 @@ sql_updateReplayCPTicks = (
 sql_checkDataType = "SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='{}' AND TABLE_NAME='{}' AND COLUMN_NAME='{}' HAVING DATA_TYPE = 'decimal' AND NUMERIC_PRECISION = 12 AND NUMERIC_SCALE = 6;"
 
 
-# SQLite
-sql_UpdateLastSeenSQLite = (
-    "UPDATE ck_playerrank SET lastseen = date('now') where steamid = '{}';"
-)
-
-
-## Not implemented in ST code yet
+## ALL below are NOT implemented in ST code yet ##
 # bonus
 sql_stray_viewBonusRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = {} AND runtime < {} AND style = {};"
 sql_stray_deleteSpecificBonus = (
@@ -202,12 +196,21 @@ sql_stray_point_calc_countFinishedBonus = "SELECT mapname, (SELECT count(1)+1 FR
 
 # checkpoints
 sql_stray_deleteWipePlayerCheckpoints = (
-    "DELETE FROM ck_checkpoints WHERE steamid = '%s';"
+    "DELETE FROM ck_checkpoints WHERE steamid = '{}';"
 )
-sql_stray_selectCPR = "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;"
-sql_stray_ccp_getPlayerPR = "SELECT db1.steamid, db1.mapname, db1.cp, db1.stage_time, db1.stage_attempts, (SELECT count(name)+1 FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND stage_time > -1.0 AND runtimepro <= db1.stage_time) AS `rank`, (SELECT count(name) FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND runtimepro > -1.0) AS total FROM ck_checkpoints db1 WHERE db1.mapname = '%s' AND db1.steamid = '%s' AND db1.stage_time > -1.0  ORDER BY cp ASC;"
+sql_stray_selectCPR = "SELECT cp, time FROM ck_checkpoints WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = 0;"
+sql_stray_ccp_getPlayerPR = "SELECT db1.steamid, db1.mapname, db1.cp, db1.stage_time, db1.stage_attempts, (SELECT count(name)+1 FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND stage_time > -1.0 AND runtimepro <= db1.stage_time) AS `rank`, (SELECT count(name) FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND runtimepro > -1.0) AS total FROM ck_checkpoints db1 WHERE db1.mapname = '{}' AND db1.steamid = '{}' AND db1.stage_time > -1.0  ORDER BY cp ASC;"
 
 # latestrecords
 sql_stray_deleteWipePlayerLatestRecords = (
-    "DELETE FROM ck_latestrecords WHERE steamid = '%s';"
+    "DELETE FROM ck_latestrecords WHERE steamid = '{}';"
 )
+
+# ck_maptier stray queries
+sql_stray_viewUnfinishedMaps = "SELECT mapname, zonegroup, zonename, (SELECT tier FROM ck_maptier d WHERE d.mapname = a.mapname) AS tier FROM ck_zones a WHERE (zonetype = 1 OR zonetype = 5) AND (SELECT runtimepro FROM ck_playertimes b WHERE b.mapname = a.mapname AND a.zonegroup = 0 AND b.style = {} AND steamid = '{}' UNION SELECT runtime FROM ck_bonus c WHERE c.mapname = a.mapname AND c.zonegroup = a.zonegroup AND c.style = {} AND steamid = '{}') IS NULL GROUP BY mapname, zonegroup ORDER BY tier, mapname, zonegroup ASC"
+sql_stray_selectMapImprovement = "SELECT mapname, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = 0) as total, (SELECT tier FROM ck_maptier b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where mapname LIKE '%{}%' AND style = 0 LIMIT 1;"
+sql_stray_viewMapnamePr = (
+    "SELECT mapname FROM ck_maptier WHERE mapname LIKE '%{}%' LIMIT 1;"
+)
+sql_stray_viewPlayerPrMapInfo = "SELECT mapname, (SELECT COUNT(1) FROM ck_zones WHERE zonetype = '3' AND mapname = '{}') AS stages, (SELECT COUNT(DISTINCT zonegroup) FROM ck_zones WHERE mapname = '{}' AND zonegroup > 0) AS bonuses FROM ck_maptier WHERE mapname = '{}';"
+sql_stray_selectMapcycle = "SELECT mapname, tier FROM ck_maptier ORDER BY mapname ASC"
