@@ -82,10 +82,10 @@ async def selectCheckpoints(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectCheckpoints.format(mapname, steamid32)
@@ -95,9 +95,8 @@ async def selectCheckpoints(
         # xquery = xquery.pop()
         print("Hit, length:", len(xquery))
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=status.HTTP_404_NOT_FOUND
-        )
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
@@ -128,10 +127,10 @@ async def selectCheckpointsinZoneGroup(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectCheckpointsinZoneGroup.format(
@@ -142,9 +141,8 @@ async def selectCheckpointsinZoneGroup(
     if len(xquery) > 0:
         print("Hit, length:", len(xquery))
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=status.HTTP_404_NOT_FOUND
-        )
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
@@ -171,10 +169,10 @@ async def selectRecordCheckpoints(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectRecordCheckpoints.format(
@@ -185,9 +183,8 @@ async def selectRecordCheckpoints(
     if len(xquery) > 0:
         print("Hit, length:", len(xquery))
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=status.HTTP_404_NOT_FOUND
-        )
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
@@ -241,14 +238,14 @@ async def selectStageTimes(
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
-    cache_key = f"selectStageTimes:-{mapname}-{steamid32}"
+    cache_key = f"selectStageTimes:{mapname}-{steamid32}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectStageTimes.format(mapname, steamid32)
@@ -257,9 +254,8 @@ async def selectStageTimes(
     if len(xquery) > 0:
         print("Hit, length:", len(xquery))
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=status.HTTP_404_NOT_FOUND
-        )
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
@@ -282,14 +278,14 @@ async def selectStageAttempts(
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
-    cache_key = f"selectStageAttempts:-{mapname}-{steamid32}"
+    cache_key = f"selectStageAttempts:{mapname}-{steamid32}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=json.loads(cached_data, use_decimal=True, parse_nan=True),
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectStageAttempts.format(mapname, steamid32)
@@ -298,9 +294,127 @@ async def selectStageAttempts(
     if len(xquery) > 0:
         print("Hit, length:", len(xquery))
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=status.HTTP_404_NOT_FOUND
-        )
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.delete(
+    "/surftimer/deleteWipePlayerCheckpoints",
+    name="Wipe Player Checkpoint",
+    tags=["ck_checkpoints", "strays"],
+)
+async def deleteWipePlayerCheckpoints(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """```char sql_stray_deleteWipePlayerCheckpoints[] = ....```"""
+    tic = time.perf_counter()
+
+    xquery = insertQuery(
+        surftimer.queries.sql_stray_deleteWipePlayerCheckpoints.format(steamid32)
+    )
+
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    if xquery < 1:
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
+    response.status_code = status.HTTP_200_OK
+    return response
+
+
+@router.get(
+    "/surftimer/selectCPR",
+    name="Get Player Checkpoints for !cpr",
+    tags=["ck_checkpoints", "strays"],
+)
+async def stray_selectCPR(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    mapname: str,
+):
+    """`char[] sql_stray_selectCPR = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectCPR:{steamid32}-{mapname}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_selectCPR.format(steamid32, mapname)
+    )
+
+    if len(xquery) > 0:
+        print("Hit, length:", len(xquery))
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/ccp_getPlayerPR",
+    name="Get Player CCP info",
+    tags=["ck_checkpoints", "strays"],
+)
+async def ccp_getPlayerPR(
+    request: Request,
+    response: Response,
+    mapname: str,
+    steamid32: str,
+):
+    """`char[] sql_stray_ccp_getPlayerPR = ....`"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"ccp_getPlayerPR:{mapname}-{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_ccp_getPlayerPR.format(steamid32, mapname)
+    )
+
+    if len(xquery) > 0:
+        print("Hit, length:", len(xquery))
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)

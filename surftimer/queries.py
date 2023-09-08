@@ -22,21 +22,6 @@ sql_selectTopBonusSurfers = "SELECT db2.steamid, db1.name, db2.runtime as overal
 sql_stray_selectPlayerSpecificBonusData = "SELECT `steamid`, `name`, `mapname`, `runtime`, zonegroup FROM `ck_bonus` WHERE `steamid` = '{}' AND `mapname` LIKE '%{}%' AND zonegroup = {} AND style = 0 LIMIT 1;"
 sql_stray_selectTotalBonusCompletes = "SELECT count(name) FROM `ck_bonus` WHERE `mapname` = '{}' AND zonegroup = {} AND style = 0 AND runtime > 0.0;"
 sql_stray_selectPlayersBonusRank = "SELECT name,mapname FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {} AND style = 0 AND runtime > -1.0) AND mapname = '{}' AND zonegroup = {} AND runtime > -1.0 ORDER BY runtime;"
-sql_stray_viewBonusRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = {} AND runtime < {} AND style = {};"
-sql_stray_deleteSpecificBonus = (
-    "DELETE FROM ck_bonus WHERE zonegroup = {} AND mapname = '{}';"
-)
-sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';"
-sql_stray_selectMapRankBonusStyle = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND style = {} AND runtime > 0.0 AND zonegroup = {}) AND mapname = '{}' AND style = {} AND zonegroup = {};"
-sql_stray_viewBonusStyleRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = '{}' AND style = '{}' AND runtime < {}"
-sql_stray_selectPersonalBonusStylesRecords = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND style = '{}' AND runtime > '0.0'"
-sql_stray_viewPRinfoMapRankBonusCallback = "SELECT COUNT(*), steamid FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname LIKE '%{}%' AND runtime > -1.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
-sql_stray_getRankSteamIdBonus = "SELECT steamid FROM ck_bonus WHERE mapname = '{}' AND style = 0 AND runtime > -1.0 AND zonegroup = '{}' ORDER BY runtime ASC LIMIT {}, 1;"
-sql_stray_deleteWipePlayerBonus = "DELETE FROM ck_bonus WHERE steamid = '{}';"
-sql_stray_pr_bonusInfo = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {};"
-## Player Points Calculation ##
-sql_stray_point_calc_countFinishedBonus = "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = {}) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = {}) as total FROM ck_bonus a WHERE steamid = '{}' AND style = {};"
-
 
 ## ck_checkpoints
 sql_createCheckpoints = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;"
@@ -196,3 +181,28 @@ sql_checkDataType = "SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE FROM inf
 sql_UpdateLastSeenSQLite = (
     "UPDATE ck_playerrank SET lastseen = date('now') where steamid = '{}';"
 )
+
+
+## Not implemented in ST code yet
+# bonus
+sql_stray_viewBonusRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = {} AND runtime < {} AND style = {};"
+sql_stray_deleteSpecificBonus = (
+    "DELETE FROM ck_bonus WHERE zonegroup = {} AND mapname = '{}';"
+)
+sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';"
+sql_stray_selectMapRankBonusStyle = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND style = {} AND runtime > 0.0 AND zonegroup = {}) AND mapname = '{}' AND style = {} AND zonegroup = {};"
+sql_stray_viewBonusStyleRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = '{}' AND style = '{}' AND runtime < {}"
+sql_stray_selectPersonalBonusStylesRecords = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND style = '{}' AND runtime > '0.0'"
+sql_stray_viewPRinfoMapRankBonusCallback = "SELECT COUNT(*), steamid FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname LIKE '%{}%' AND runtime > -1.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
+sql_stray_getRankSteamIdBonus = "SELECT steamid FROM ck_bonus WHERE mapname = '{}' AND style = 0 AND runtime > -1.0 AND zonegroup = '{}' ORDER BY runtime ASC LIMIT {}, 1;"
+sql_stray_deleteWipePlayerBonus = "DELETE FROM ck_bonus WHERE steamid = '{}';"
+sql_stray_pr_bonusInfo = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {};"
+## Player Points Calculation ##
+sql_stray_point_calc_countFinishedBonus = "SELECT mapname, (SELECT count(1)+1 FROM ck_bonus b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup AND b.style = {}) AS `rank`, (SELECT count(1) FROM ck_bonus b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup AND b.style = {}) as total FROM ck_bonus a WHERE steamid = '{}' AND style = {};"
+
+# checkpoints
+sql_stray_deleteWipePlayerCheckpoints = (
+    "DELETE FROM ck_checkpoints WHERE steamid = '%s';"
+)
+sql_stray_selectCPR = "SELECT cp, time FROM ck_checkpoints WHERE steamid = '%s' AND mapname = '%s' AND zonegroup = 0;"
+sql_stray_ccp_getPlayerPR = "SELECT db1.steamid, db1.mapname, db1.cp, db1.stage_time, db1.stage_attempts, (SELECT count(name)+1 FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND stage_time > -1.0 AND runtimepro <= db1.stage_time) AS `rank`, (SELECT count(name) FROM ck_wrcps WHERE style = 0 AND mapname = db1.mapname AND stage = db1.cp AND runtimepro > -1.0) AS total FROM ck_checkpoints db1 WHERE db1.mapname = '%s' AND db1.steamid = '%s' AND db1.stage_time > -1.0  ORDER BY cp ASC;"
