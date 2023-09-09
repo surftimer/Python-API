@@ -214,3 +214,33 @@ sql_stray_viewMapnamePr = (
 )
 sql_stray_viewPlayerPrMapInfo = "SELECT mapname, (SELECT COUNT(1) FROM ck_zones WHERE zonetype = '3' AND mapname = '{}') AS stages, (SELECT COUNT(DISTINCT zonegroup) FROM ck_zones WHERE mapname = '{}' AND zonegroup > 0) AS bonuses FROM ck_maptier WHERE mapname = '{}';"
 sql_stray_selectMapcycle = "SELECT mapname, tier FROM ck_maptier ORDER BY mapname ASC"
+
+
+# # ck_playeroptions2
+# char sql_stray_deleteWipePlayerOptions[]			= "DELETE FROM ck_playeroptions2 WHERE steamid = '{}';"
+
+# # ck_playerrank
+# char sql_stray_deleteWipePlayerRank[]				= "DELETE FROM ck_playerrank WHERE steamid = '{}';"
+# char sql_stray_point_calc_playerRankData[]			= "SELECT name FROM ck_playerrank WHERE steamid = '{}' AND style = {};"
+# char sql_stray_playerRankByName[]					= "SELECT steamid FROM ck_playerrank WHERE style = {} AND name LIKE '%{}%' LIMIT 1;"
+# char sql_stray_cleanupPlayerRank[]					= "DELETE FROM ck_playerrank WHERE `points` <= 0"
+# char sql_stray_specificCountryRank[]				= "SELECT COUNT(steamid), country FROM ck_playerrank WHERE country = '{}' AND style = {};"
+# char sql_stray_getPlayerPoints[]					= "SELECT points FROM ck_playerrank WHERE name = '{}' AND style = {};"
+# char sql_stray_getPlayerCountryRank[]				= "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE country = '{}' AND style = {} AND points > {};"
+# char sql_stray_countryRankGetPlayerByName[]			= "SELECT * FROM ck_playerrank WHERE name = '{}';"
+# char sql_stray_countryRankPlayerCountryRankByName[] = "SELECT country FROM ck_playerrank WHERE name = '{}' AND style = {};"
+# char sql_stray_countryTop[]							= "SELECT name, country, points, style FROM ck_playerrank WHERE country = '{}' AND style = {} ORDER BY points DESC LIMIT 100;"
+# char sql_stray_countryTopAllCountries[]				= "SELECT DISTINCT(country) FROM ck_playerrank WHERE style = {} ORDER BY country;"
+# char sql_stray_specificContinentRank[]				= "SELECT COUNT(steamid) FROM ck_playerrank WHERE continentCode = '{}' AND style = {};"
+# char sql_stray_continentPlayerPoints[]				= "SELECT points FROM ck_playerrank WHERE name = '{}' AND style = {};"
+# char sql_stray_continentPlayerRank[]				= "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE continentCode = '{}' AND style = {} AND points > {};"
+# char sql_stray_continentPlayerRankByName[]			= "SELECT * FROM ck_playerrank WHERE name = '{}';"
+# char sql_stray_continentGetPlayerContinentByName[]	= "SELECT continentCode FROM ck_playerrank WHERE name = '{}' AND style = {};"
+# char sql_stray_continentTop[]						= "SELECT name,  points, style FROM ck_playerrank WHERE continentCode = '{}' AND style = {} ORDER BY points DESC LIMIT 100;"
+# char sql_stray_continentNames[]						= "SELECT DISTINCT(continentCode) FROM ck_playerrank WHERE style = {} AND continentCode IS NOT NULL ORDER BY continentCode;"
+# char sql_stray_viewPlayerRank[]						= "SELECT name, points, style FROM ck_playerrank WHERE style = {} AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '{}' AND style = {}) ORDER BY points;"
+# char sql_stray_getNextRankPoints[]					= "SELECT points FROM ck_playerrank WHERE style = %d ORDER BY points DESC LIMIT %d,1;"
+# char sql_stray_viewPlayerInfo[]						= "SELECT steamid, steamid64, name, country, lastseen, joined, connections, timealive, timespec FROM ck_playerrank WHERE steamid = '{}';"
+# char sql_stray_rankCommand[]						= "SELECT name, points FROM ck_playerrank WHERE style = 0 ORDER BY points DESC LIMIT {}, 1;"
+# char sql_stray_rankCommandSelf[]					= "SELECT name, points FROM ck_playerrank WHERE steamid = '{}' AND style = 0;"
+# char sql_stray_selectPlayerRankUnknown[]			= "SELECT steamid, name, points FROM ck_playerrank WHERE name LIKE '%{}%' ORDER BY points DESC LIMIT 0, 1;"
