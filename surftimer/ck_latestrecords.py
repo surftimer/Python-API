@@ -45,10 +45,9 @@ async def selectLatestRecord(request: Request, response: Response):
     xquery = selectQuery(surftimer.queries.sql_selectLatestRecords)
 
     if len(xquery) <= 0:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"xtime": time.perf_counter() - tic},
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")

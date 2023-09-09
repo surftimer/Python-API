@@ -179,8 +179,7 @@ def selectPersonalBonusRecords(
 
     if len(xquery) <= 0:
         response.headers["content-type"] = "application/json"
-        response.status_code = status.HTTP_404_NOT_FOUND
-        response.body = {"xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
     toc = time.perf_counter()
@@ -230,8 +229,7 @@ def selectPlayerRankBonus(
 
     if len(xquery) <= 0:
         response.headers["content-type"] = "application/json"
-        response.status_code = status.HTTP_404_NOT_FOUND
-        response.body = {"xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
     toc = time.perf_counter()
@@ -270,8 +268,7 @@ def selectFastestBonus(
 
     if len(xquery) <= 0:
         response.headers["content-type"] = "application/json"
-        response.status_code = status.HTTP_404_NOT_FOUND
-        response.body = {"xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
     toc = time.perf_counter()
@@ -310,8 +307,7 @@ def selectAllBonusTimesinMap(
 
     if len(xquery) <= 0:
         response.headers["content-type"] = "application/json"
-        response.status_code = status.HTTP_404_NOT_FOUND
-        response.body = {"xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
     toc = time.perf_counter()
@@ -359,8 +355,7 @@ def selectTopBonusSurfers(
 
     if len(xquery) <= 0:
         response.headers["content-type"] = "application/json"
-        response.status_code = status.HTTP_404_NOT_FOUND
-        response.body = {"xtime": time.perf_counter() - tic}
+        response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
     toc = time.perf_counter()
