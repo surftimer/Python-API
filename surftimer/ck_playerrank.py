@@ -255,7 +255,7 @@ async def selectPlayerName(
     steamid32: str,
 ):
     """`char[] sql_selectPlayerName = ....`. \n
-    Merged with `sql_stray_point_calc_playerRankData`"""
+    Merged with `sql_stray_point_calc_playerRankName`"""
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
@@ -708,21 +708,21 @@ def deleteWipePlayerRank(
 
 
 @router.get(
-    "/surftimer/point_calc_playerRankData",
+    "/surftimer/point_calc_playerRankName",
     name="Select Player Name",
     tags=["ck_playerrank", "strays", "Point Calculation"],
 )
-async def point_calc_playerRankData(
+async def point_calc_playerRankName(
     request: Request,
     response: Response,
     steamid32: str,
     style: int,
 ):
-    """```char sql_stray_point_calc_playerRankData[] = ....```"""
+    """```char sql_stray_point_calc_playerRankName[] = ....```"""
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
-    cache_key = f"point_calc_playerRankData:{steamid32}-{style}"
+    cache_key = f"point_calc_playerRankName:{steamid32}-{style}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -732,7 +732,7 @@ async def point_calc_playerRankData(
         return response
 
     xquery = selectQuery(
-        surftimer.queries.sql_stray_point_calc_playerRankData.format(steamid32, style)
+        surftimer.queries.sql_stray_point_calc_playerRankName.format(steamid32, style)
     )
 
     if xquery:

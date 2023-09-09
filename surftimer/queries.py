@@ -221,7 +221,7 @@ sql_stray_selectMapcycle = "SELECT mapname, tier FROM ck_maptier ORDER BY mapnam
 
 # # ck_playerrank
 sql_stray_deleteWipePlayerRank = "DELETE FROM ck_playerrank WHERE steamid = '{}';"
-sql_stray_point_calc_playerRankData = "SELECT name FROM ck_playerrank WHERE steamid = '{}' AND style = {};"  # duplicate of sql_selectPlayerName
+sql_stray_point_calc_playerRankName = "SELECT name FROM ck_playerrank WHERE steamid = '{}' AND style = {};"  # duplicate of sql_selectPlayerName
 # sql_stray_playerRankByName					= "SELECT steamid FROM ck_playerrank WHERE style = {} AND name LIKE '%{}%' LIMIT 1;"
 # sql_stray_cleanupPlayerRank					= "DELETE FROM ck_playerrank WHERE `points` <= 0"
 # sql_stray_specificCountryRank				= "SELECT COUNT(steamid), country FROM ck_playerrank WHERE country = '{}' AND style = {};"
