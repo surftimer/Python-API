@@ -185,3 +185,37 @@ async def updatePlayerOptions(
     response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
+
+@router.delete(
+    "/surftimer/deleteWipePlayerOptions",
+    name="Wipe Player Options",
+    tags=["ck_playeroptions2", "strays", "Wipe"],
+)
+def deleteWipePlayerOptions(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """```char sql_stray_deleteWipePlayerOptions[] = ....```\n
+    Wipes player options for player"""
+    tic = time.perf_counter()
+
+    xquery = insertQuery(
+        surftimer.queries.sql_stray_deleteWipePlayerOptions.format(steamid32)
+    )
+
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    if xquery < 1:
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
+    response.status_code = status.HTTP_200_OK
+    return response

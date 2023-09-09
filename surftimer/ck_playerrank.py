@@ -247,13 +247,15 @@ async def updatePlayerRank(
     "/surftimer/selectPlayerName",
     name="Select Player Name",
     tags=["ck_playerrank"],
+    deprecated=True,
 )
 async def selectPlayerName(
     request: Request,
     response: Response,
     steamid32: str,
 ):
-    """`char[] sql_selectPlayerName = ....`"""
+    """`char[] sql_selectPlayerName = ....`. \n
+    Merged with `sql_stray_point_calc_playerRankData`"""
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
@@ -669,3 +671,81 @@ async def updatePlayerConnections(
     response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
+
+
+@router.delete(
+    "/surftimer/deleteWipePlayerRank",
+    name="Wipe Player Rank",
+    tags=["ck_playerrank", "strays", "Wipe"],
+)
+def deleteWipePlayerRank(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """```char sql_stray_deleteWipePlayerRank[] = ....```\n
+    Wipes all `playerrank` entries for player"""
+    tic = time.perf_counter()
+
+    xquery = insertQuery(
+        surftimer.queries.sql_stray_deleteWipePlayerRank.format(steamid32)
+    )
+
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    if xquery < 1:
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
+    response.status_code = status.HTTP_200_OK
+    return response
+
+
+@router.get(
+    "/surftimer/point_calc_playerRankData",
+    name="Select Player Name",
+    tags=["ck_playerrank", "strays", "Point Calculation"],
+)
+async def point_calc_playerRankData(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    style: int,
+):
+    """```char sql_stray_point_calc_playerRankData[] = ....```"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"point_calc_playerRankData:{steamid32}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_point_calc_playerRankData.format(steamid32, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
