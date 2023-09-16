@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Upload files
-        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         env:
           FTP_SERVER: ${{ secrets.SFTP_HOST }}
           FTP_USERNAME: ${{ secrets.SFTP_USER }}
