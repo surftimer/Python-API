@@ -27,6 +27,7 @@ jobs:
           password: ${{ secrets.SFTP_PASS }}
           localDir: './'
           remoteDir: './'
+          exclude: '.git*'
 
       - name: Stop the Pterodactyl server
         shell: bash
