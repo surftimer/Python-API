@@ -263,17 +263,18 @@ async def selectPlayerName(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_selectPlayerName.format(steamid32))
 
     if xquery:
         xquery = xquery.pop()
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {"steamid32": steamid32}
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -337,17 +338,18 @@ async def selectTopPlayers(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_selectTopPlayers.format(style))
 
     if xquery:
         xquery = xquery
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {"style": style}
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -379,9 +381,10 @@ async def selectRankedPlayersRank(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectRankedPlayersRank.format(style, steamid32, style)
@@ -390,9 +393,8 @@ async def selectRankedPlayersRank(
     if xquery:
         xquery = xquery
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {"steamid32": steamid32}
-        xquery["xtime"] = time.perf_counter() - tic
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -417,9 +419,10 @@ async def selectRankedPlayers(request: Request, response: Response):
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_selectRankedPlayers)
     # xquery = []
@@ -427,9 +430,8 @@ async def selectRankedPlayers(request: Request, response: Response):
     if len(xquery) > 0:
         xquery = xquery
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {}
-        xquery["xtime"] = time.perf_counter() - tic
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -455,9 +457,10 @@ async def selectRankedPlayer(request: Request, response: Response, steamid32: st
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_selectRankedPlayer.format(steamid32))
     # xquery = []
@@ -465,9 +468,8 @@ async def selectRankedPlayer(request: Request, response: Response, steamid32: st
     if len(xquery) > 0:
         xquery = xquery
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {}
-        xquery["xtime"] = time.perf_counter() - tic
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -497,17 +499,18 @@ async def countRankedPlayers(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_CountRankedPlayers.format(style))
 
     if xquery:
         xquery = xquery.pop()
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {"style": style}
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -536,16 +539,18 @@ async def countRankedPlayers2(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
     xquery = selectQuery(surftimer.queries.sql_CountRankedPlayers2.format(style))
 
     if xquery:
         xquery = xquery.pop()
     else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        xquery = {"style": style}
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     toc = time.perf_counter()
 
@@ -576,9 +581,10 @@ async def selectPlayerProfile(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(
         surftimer.queries.sql_selectPlayerProfile.format(steamid32, style)
@@ -587,8 +593,10 @@ async def selectPlayerProfile(
     if xquery:
         xquery = xquery.pop()
     else:
-        xquery = {"steamid32": steamid32, "style": style}
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=xquery)
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     toc = time.perf_counter()
 
@@ -618,17 +626,20 @@ async def selectUnknownPlayerProfile(
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
-        return JSONResponse(
-            status_code=status.HTTP_200_OK, content=json.loads(cached_data)
-        )
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
 
     xquery = selectQuery(surftimer.queries.sql_selectPlayerRankUnknown.format(name))
 
     if xquery:
         xquery = xquery.pop()
     else:
-        xquery = {"name": name}
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=xquery)
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
 
     toc = time.perf_counter()
 
@@ -749,3 +760,893 @@ async def point_calc_playerRankName(
     set_cache(cache_key, xquery)
 
     return xquery
+
+
+@router.delete(
+    "/surftimer/cleanupPlayerRank",
+    name="Cleanup Player Rank",
+    tags=["ck_playerrank", "strays"],
+)
+def cleanupPlayerRank(
+    request: Request,
+    response: Response,
+):
+    """```char sql_stray_cleanupPlayerRank[] = ....```\n
+    Deletes all `playerrank` entries for player with no points"""
+    tic = time.perf_counter()
+
+    xquery = insertQuery(surftimer.queries.sql_stray_cleanupPlayerRank.format())
+
+    content_data = {"deleted": xquery, "xtime": time.perf_counter() - tic}
+    if xquery < 1:
+        # response.body = json.dumps(content_data).encode('utf-8')
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_304_NOT_MODIFIED
+        return response
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    response.body = json.dumps(content_data).encode("utf-8")
+    response.headers["content-type"] = "application/json"
+    response.status_code = status.HTTP_200_OK
+    return response
+
+
+@router.get(
+    "/surftimer/specificCountryRank",
+    name="Country Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def specificCountryRank(
+    request: Request,
+    response: Response,
+    country: str,
+    style: int,
+):
+    """`char[] sql_stray_specificCountryRank = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"specificCountryRank:{country}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_specificCountryRank.format(country, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getPlayerPointsByName",
+    name="Player Points by Name",
+    tags=["ck_playerrank", "strays"],
+)
+async def getPlayerPointsByName(
+    request: Request,
+    response: Response,
+    name: str,
+    style: int,
+):
+    """`char[] sql_stray_getPlayerPointsByName = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"getPlayerPointsByName:{name}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_getPlayerPointsByName.format(name, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/continentPlayerRankByName",
+    name="Continent Player Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def continentPlayerRankByName(
+    request: Request,
+    response: Response,
+    name: str,
+):
+    """`char[] sql_stray_continentPlayerRankByName = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"countryRankGetPlayerByName:{name}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_continentPlayerRankByName.format(name)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getPlayerCountryRank",
+    name="Player Country Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def getPlayerCountryRank(
+    request: Request,
+    response: Response,
+    country: str,
+    style: int,
+    points: int,
+):
+    """`char[] sql_stray_getPlayerCountryRank = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"getPlayerCountryRank:{country}-{style}-{points}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_getPlayerCountryRank.format(country, style, points)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getPlayerCountryRank",
+    name="Player Country Rank by Name",
+    tags=["ck_playerrank", "strays"],
+)
+async def getPlayerCountryRank(
+    request: Request,
+    response: Response,
+    name: str,
+    style: int,
+):
+    """`char[] sql_stray_countryRankPlayerCountryRankByName = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"getPlayerCountryRank:{name}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_countryRankPlayerCountryRankByName.format(
+            name, style
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/countryTop",
+    name="Country Top 100",
+    tags=["ck_playerrank", "strays"],
+)
+async def countryTop(
+    request: Request,
+    response: Response,
+    country: str,
+    style: int,
+):
+    """`char[] sql_stray_countryTop = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"getPlayerCountryRank:{country}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_stray_countryTop.format(country, style))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/countryTopAllCountries",
+    name="All Countries in Top",
+    tags=["ck_playerrank", "strays"],
+)
+async def countryTopAllCountries(
+    request: Request,
+    response: Response,
+    style: int,
+):
+    """`char[] sql_stray_countryTopAllCountries = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"countryTopAllCountries:{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_countryTopAllCountries.format(style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/specificContinentRank",
+    name="Continent Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def specificContinentRank(
+    request: Request,
+    response: Response,
+    continentCode: str,
+    style: int,
+):
+    """`char[] sql_stray_specificContinentRank = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"specificContinentRank:{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_specificContinentRank.format(continentCode, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/continentPlayerPoints",
+    name="Continent Player Points",
+    tags=["ck_playerrank", "strays"],
+    deprecated=True,
+)
+async def continentPlayerPoints(
+    request: Request,
+    response: Response,
+    continentCode: str,
+    style: int,
+):
+    """`char[] sql_stray_continentPlayerPoints = ....`\n
+    same as `/surftimer/getPlayerPointsByName`"""
+    tic = time.perf_counter()
+
+    cache_key = f"continentPlayerPoints:{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_continentPlayerPoints.format(continentCode, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/continentPlayerRank",
+    name="Player Continent Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def continentPlayerRank(
+    request: Request,
+    response: Response,
+    continentCode: str,
+    style: int,
+    points: int,
+):
+    """`char[] sql_stray_continentPlayerRank = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"continentPlayerRank:{continentCode}-{style}-{points}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_continentPlayerRank.format(
+            continentCode, style, points
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/continentGetPlayerContinentByName",
+    name="Player Continent by Name",
+    tags=["ck_playerrank", "strays"],
+)
+async def continentGetPlayerContinentByName(
+    request: Request,
+    response: Response,
+    name: str,
+    style: int,
+):
+    """`char[] sql_stray_continentGetPlayerContinentByName = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"continentGetPlayerContinentByName:{name}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_continentGetPlayerContinentByName.format(
+            name, style
+        )
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/continentTop",
+    name="Continent Top",
+    tags=["ck_playerrank", "strays"],
+)
+async def continentTop(
+    request: Request,
+    response: Response,
+    continentCode: str,
+    style: int,
+):
+    """`char[] sql_stray_continentTop = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"continentTop:{continentCode}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_continentTop.format(continentCode, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/continentNames",
+    name="All Continent Names",
+    tags=["ck_playerrank", "strays"],
+)
+async def continentNames(
+    request: Request,
+    response: Response,
+    style: int,
+):
+    """`char[] sql_stray_continentNames = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"continentNames:{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_stray_continentNames.format(style))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/viewPlayerRank",
+    name="Player Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def viewPlayerRank(
+    request: Request,
+    response: Response,
+    style: int,
+    steamid32: str,
+):
+    """`char[] sql_stray_viewPlayerRank = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"viewPlayerRank:{style}-{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_viewPlayerRank.format(style, steamid32, style)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getNextRankPoints",
+    name="Player Points to Next Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def getNextRankPoints(
+    request: Request,
+    response: Response,
+    style: int,
+    limit: int,
+):
+    """`char[] sql_stray_getNextRankPoints = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"getNextRankPoints:{style}-{limit}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_getNextRankPoints.format(style, limit)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/viewPlayerInfo",
+    name="Player Info - TO BE MERGED",
+    tags=["ck_playerrank", "strays"],
+)
+async def viewPlayerInfo(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """To be merged with a `SELECT *` *(?)*\n
+    `char[] sql_stray_viewPlayerInfo = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"viewPlayerInfo:{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_stray_viewPlayerInfo.format(steamid32))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/rankCommand",
+    name="/rank command?",
+    tags=["ck_playerrank", "strays"],
+)
+async def rankCommand(
+    request: Request,
+    response: Response,
+    limit: int,
+):
+    """`char[] sql_stray_rankCommand = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"rankCommand:{limit}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_stray_rankCommand.format(limit))
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/rankCommandSelf",
+    name="Player Points to Next Rank",
+    tags=["ck_playerrank", "strays"],
+)
+async def rankCommandSelf(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    limit: int,
+):
+    """`char[] sql_stray_rankCommandSelf = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"rankCommandSelf:{steamid32}-{limit}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_rankCommandSelf.format(steamid32, limit)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/selectPlayerRankUnknown",
+    name="Unknown Player Info - TO BE MERGED",
+    tags=["ck_playerrank", "strays"],
+)
+async def selectPlayerRankUnknown(
+    request: Request,
+    response: Response,
+    name: str,
+):
+    """`char[] sql_stray_selectPlayerRankUnknown = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"selectPlayerRankUnknown:{name}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_selectPlayerRankUnknown.format(name)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+
+@router.get(
+    "/surftimer/selectPlayerRankUnknown",
+    name="Unknown Player Info - TO BE MERGED",
+    tags=["ck_playerrank", "strays"],
+)
+async def selectPlayerRankUnknown(
+    request: Request,
+    response: Response,
+    style: int,
+    name: str,
+):
+    """`char[] sql_stray_playerRankByName = ....`"""
+    tic = time.perf_counter()
+
+    cache_key = f"playerRankByName:{style}-{name}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_stray_playerRankByName.format(style, name)
+    )
+
+    if xquery:
+        xquery = xquery.pop()
+    else:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
