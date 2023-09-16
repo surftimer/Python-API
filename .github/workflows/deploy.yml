@@ -25,8 +25,8 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           username: ${{ secrets.SFTP_USER }}
           password: ${{ secrets.SFTP_PASS }}
-          localDir: '/'
-          remoteDir: '/'
+          localDir: './'
+          remoteDir: './'
 
       - name: Stop the Pterodactyl server
         shell: bash
