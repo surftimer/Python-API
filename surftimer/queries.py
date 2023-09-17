@@ -243,3 +243,8 @@ sql_stray_viewPlayerInfo						= "SELECT steamid, steamid64, name, country, lasts
 sql_stray_rankCommand						= "SELECT name, points FROM ck_playerrank WHERE style = 0 ORDER BY points DESC LIMIT {}, 1;"
 sql_stray_rankCommandSelf					= "SELECT name, points FROM ck_playerrank WHERE steamid = '{}' AND style = 0;"
 sql_stray_selectPlayerRankUnknown			= "SELECT steamid, name, points FROM ck_playerrank WHERE name LIKE '%{}%' ORDER BY points DESC LIMIT 0, 1;"
+
+
+## point calc
+sql_stray_point_calc_finishedStages			= "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '{}' AND style = {};"
+sql_stray_point_calc_finishedMaps			= "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = {}) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = {}) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '{}' AND style = {};"
