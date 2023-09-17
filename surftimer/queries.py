@@ -61,8 +61,8 @@ sql_stray_deleteWipePlayerOptions = (
 ## ck_playerrank
 sql_createPlayerRank = "CREATE TABLE IF NOT EXISTS `ck_playerrank` (`steamid` varchar(32) NOT NULL DEFAULT '', `steamid64` varchar(64) DEFAULT NULL, `name` varchar(64) DEFAULT NULL, `country` varchar(32) DEFAULT NULL, `countryCode` varchar(3) DEFAULT NULL, `continentCode` varchar(3) DEFAULT NULL, `points` int(12) DEFAULT '0', `wrpoints` int(12) NOT NULL DEFAULT '0', `wrbpoints` int(12) NOT NULL DEFAULT '0', `wrcppoints` int(11) NOT NULL DEFAULT '0', `top10points` int(12) NOT NULL DEFAULT '0', `groupspoints` int(12) NOT NULL DEFAULT '0', `mappoints` int(11) NOT NULL DEFAULT '0', `bonuspoints` int(12) NOT NULL DEFAULT '0', `finishedmaps` int(12) DEFAULT '0', `finishedmapspro` int(12) DEFAULT '0', `finishedbonuses` int(12) NOT NULL DEFAULT '0', `finishedstages` int(12) NOT NULL DEFAULT '0', `wrs` int(12) NOT NULL DEFAULT '0', `wrbs` int(12) NOT NULL DEFAULT '0', `wrcps` int(12) NOT NULL DEFAULT '0', `top10s` int(12) NOT NULL DEFAULT '0', `groups` int(12) NOT NULL DEFAULT '0', `lastseen` int(64) DEFAULT NULL, `joined` int(64) NOT NULL, `timealive` int(64) NOT NULL DEFAULT '0', `timespec` int(64) NOT NULL DEFAULT '0', `connections` int(64) NOT NULL DEFAULT '1', `readchangelog` int(11) NOT NULL DEFAULT '0', `style` int(11) NOT NULL DEFAULT '0', PRIMARY KEY (`steamid`, `style`)) DEFAULT CHARSET=utf8mb4;"
 sql_insertPlayerRank = "INSERT INTO ck_playerrank (steamid, steamid64, name, country, countryCode, continentCode, joined, style) VALUES('{}', '{}', '{}', '{}', '{}', '{}', {}, {})"
-sql_updatePlayerRankPoints = "UPDATE ck_playerrank SET name ='{}', points ='{}', wrpoints = {}, wrbpoints = {}, wrcppoints = {}, top10points = {}, groupspoints = {}, mappoints = {}, bonuspoints = {}, finishedmapspro='{}', finishedbonuses = {}, finishedstages = {}, wrs = {}, wrbs = {}, wrcps = {}, top10s = {}, `groups` = {} where steamid='{}' AND style = {};"
-sql_updatePlayerRankPoints2 = "UPDATE ck_playerrank SET name ='{}', points ='{}', wrpoints = {}, wrbpoints = {}, wrcppoints = {}, top10points = {}, groupspoints = {}, mappoints = {}, bonuspoints = {}, finishedmapspro='{}', finishedbonuses = {}, finishedstages = {}, wrs = {}, wrbs = {}, wrcps = {}, top10s = {}, `groups` = {}, country = '{}', countryCode = '{}', continentCode = '{}' where steamid='{}' AND style = {};"
+sql_updatePlayerRankPoints = "UPDATE ck_playerrank SET name ='{}', points ={}, wrpoints = {}, wrbpoints = {}, wrcppoints = {}, top10points = {}, groupspoints = {}, mappoints = {}, bonuspoints = {}, finishedmapspro={}, finishedbonuses = {}, finishedstages = {}, wrs = {}, wrbs = {}, wrcps = {}, top10s = {}, `groups` = {} where steamid='{}' AND style = {};"
+sql_updatePlayerRankPoints2 = "UPDATE ck_playerrank SET name ='{}', points ={}, wrpoints = {}, wrbpoints = {}, wrcppoints = {}, top10points = {}, groupspoints = {}, mappoints = {}, bonuspoints = {}, finishedmapspro={}, finishedbonuses = {}, finishedstages = {}, wrs = {}, wrbs = {}, wrcps = {}, top10s = {}, `groups` = {}, country = '{}', countryCode = '{}', continentCode = '{}' where steamid='{}' AND style = {};"
 sql_updatePlayerRank = "UPDATE ck_playerrank SET finishedmaps ='{}', finishedmapspro='{}' where steamid='{}' AND style = '{}';"
 sql_selectPlayerName = "SELECT name FROM ck_playerrank where steamid = '{}'"
 sql_UpdateLastSeenMySQL = (
@@ -222,29 +222,45 @@ sql_stray_selectMapcycle = "SELECT mapname, tier FROM ck_maptier ORDER BY mapnam
 # # ck_playerrank
 sql_stray_deleteWipePlayerRank = "DELETE FROM ck_playerrank WHERE steamid = '{}';"
 sql_stray_point_calc_playerRankName = "SELECT name FROM ck_playerrank WHERE steamid = '{}' AND style = {};"  # duplicate of sql_selectPlayerName
-sql_stray_playerRankByName					= "SELECT steamid FROM ck_playerrank WHERE style = {} AND name LIKE '%{}%' LIMIT 1;"
-sql_stray_cleanupPlayerRank					= "DELETE FROM ck_playerrank WHERE `points` <= 0;"
-sql_stray_specificCountryRank				= "SELECT COUNT(steamid), country FROM ck_playerrank WHERE country = '{}' AND style = {};"
-sql_stray_getPlayerPointsByName					= "SELECT points FROM ck_playerrank WHERE name = '{}' AND style = {};"
-sql_stray_getPlayerCountryRank				= "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE country = '{}' AND style = {} AND points > {};"
-sql_stray_countryRankPlayerCountryRankByName = "SELECT country FROM ck_playerrank WHERE name = '{}' AND style = {};"
-sql_stray_countryTop							= "SELECT name, country, points, style FROM ck_playerrank WHERE country = '{}' AND style = {} ORDER BY points DESC LIMIT 100;"
-sql_stray_countryTopAllCountries				= "SELECT DISTINCT(country) FROM ck_playerrank WHERE style = {} ORDER BY country;"
-sql_stray_specificContinentRank				= "SELECT COUNT(steamid) FROM ck_playerrank WHERE continentCode = '{}' AND style = {};"
-sql_stray_continentPlayerPoints				= "SELECT points FROM ck_playerrank WHERE name = '{}' AND style = {};"
-sql_stray_continentPlayerRank				= "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE continentCode = '{}' AND style = {} AND points > {};"
-sql_stray_continentPlayerRankByName			= "SELECT * FROM ck_playerrank WHERE name = '{}';"
-sql_stray_continentGetPlayerContinentByName	= "SELECT continentCode FROM ck_playerrank WHERE name = '{}' AND style = {};"
-sql_stray_continentTop						= "SELECT name,  points, style FROM ck_playerrank WHERE continentCode = '{}' AND style = {} ORDER BY points DESC LIMIT 100;"
-sql_stray_continentNames						= "SELECT DISTINCT(continentCode) FROM ck_playerrank WHERE style = {} AND continentCode IS NOT NULL ORDER BY continentCode;"
-sql_stray_viewPlayerRank						= "SELECT name, points, style FROM ck_playerrank WHERE style = {} AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '{}' AND style = {}) ORDER BY points;"
-sql_stray_getNextRankPoints					= "SELECT points FROM ck_playerrank WHERE style = {} ORDER BY points DESC LIMIT {},1;"
-sql_stray_viewPlayerInfo						= "SELECT steamid, steamid64, name, country, lastseen, joined, connections, timealive, timespec FROM ck_playerrank WHERE steamid = '{}';"
-sql_stray_rankCommand						= "SELECT name, points FROM ck_playerrank WHERE style = 0 ORDER BY points DESC LIMIT {}, 1;"
-sql_stray_rankCommandSelf					= "SELECT name, points FROM ck_playerrank WHERE steamid = '{}' AND style = 0;"
-sql_stray_selectPlayerRankUnknown			= "SELECT steamid, name, points FROM ck_playerrank WHERE name LIKE '%{}%' ORDER BY points DESC LIMIT 0, 1;"
+sql_stray_playerRankByName = (
+    "SELECT steamid FROM ck_playerrank WHERE style = {} AND name LIKE '%{}%' LIMIT 1;"
+)
+sql_stray_cleanupPlayerRank = "DELETE FROM ck_playerrank WHERE `points` <= 0;"
+sql_stray_specificCountryRank = "SELECT COUNT(steamid), country FROM ck_playerrank WHERE country = '{}' AND style = {};"
+sql_stray_getPlayerPointsByName = (
+    "SELECT points FROM ck_playerrank WHERE name = '{}' AND style = {};"
+)
+sql_stray_getPlayerCountryRank = "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE country = '{}' AND style = {} AND points > {};"
+sql_stray_countryRankPlayerCountryRankByName = (
+    "SELECT country FROM ck_playerrank WHERE name = '{}' AND style = {};"
+)
+sql_stray_countryTop = "SELECT name, country, points, style FROM ck_playerrank WHERE country = '{}' AND style = {} ORDER BY points DESC LIMIT 100;"
+sql_stray_countryTopAllCountries = (
+    "SELECT DISTINCT(country) FROM ck_playerrank WHERE style = {} ORDER BY country;"
+)
+sql_stray_specificContinentRank = "SELECT COUNT(steamid) FROM ck_playerrank WHERE continentCode = '{}' AND style = {};"
+sql_stray_continentPlayerPoints = (
+    "SELECT points FROM ck_playerrank WHERE name = '{}' AND style = {};"
+)
+sql_stray_continentPlayerRank = "SELECT COUNT(steamid) + 1 FROM ck_playerrank WHERE continentCode = '{}' AND style = {} AND points > {};"
+sql_stray_continentPlayerRankByName = "SELECT * FROM ck_playerrank WHERE name = '{}';"
+sql_stray_continentGetPlayerContinentByName = (
+    "SELECT continentCode FROM ck_playerrank WHERE name = '{}' AND style = {};"
+)
+sql_stray_continentTop = "SELECT name,  points, style FROM ck_playerrank WHERE continentCode = '{}' AND style = {} ORDER BY points DESC LIMIT 100;"
+sql_stray_continentNames = "SELECT DISTINCT(continentCode) FROM ck_playerrank WHERE style = {} AND continentCode IS NOT NULL ORDER BY continentCode;"
+sql_stray_viewPlayerRank = "SELECT name, points, style FROM ck_playerrank WHERE style = {} AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '{}' AND style = {}) ORDER BY points;"
+sql_stray_getNextRankPoints = (
+    "SELECT points FROM ck_playerrank WHERE style = {} ORDER BY points DESC LIMIT {},1;"
+)
+sql_stray_viewPlayerInfo = "SELECT steamid, steamid64, name, country, lastseen, joined, connections, timealive, timespec FROM ck_playerrank WHERE steamid = '{}';"
+sql_stray_rankCommand = "SELECT name, points FROM ck_playerrank WHERE style = 0 ORDER BY points DESC LIMIT {}, 1;"
+sql_stray_rankCommandSelf = (
+    "SELECT name, points FROM ck_playerrank WHERE steamid = '{}' AND style = 0;"
+)
+sql_stray_selectPlayerRankUnknown = "SELECT steamid, name, points FROM ck_playerrank WHERE name LIKE '%{}%' ORDER BY points DESC LIMIT 0, 1;"
 
 
 ## point calc
-sql_stray_point_calc_finishedStages			= "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '{}' AND style = {};"
-sql_stray_point_calc_finishedMaps			= "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = {}) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = {}) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '{}' AND style = {};"
+sql_stray_point_calc_finishedStages = "SELECT mapname, stage, (select count(1)+1 from ck_wrcps b where a.mapname=b.mapname and a.runtimepro > b.runtimepro and a.style = b.style and a.stage = b.stage) AS `rank` FROM ck_wrcps a where steamid = '{}' AND style = {};"
+sql_stray_point_calc_finishedMaps = "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro AND b.style = {}) AS `rank`, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname AND b.style = {}) as total, (SELECT tier FROM `ck_maptier` b WHERE a.mapname = b.mapname) as tier FROM ck_playertimes a where steamid = '{}' AND style = {};"

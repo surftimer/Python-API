@@ -1607,7 +1607,6 @@ async def selectPlayerRankUnknown(
     return xquery
 
 
-
 @router.get(
     "/surftimer/selectPlayerRankUnknown",
     name="Unknown Player Info - TO BE MERGED",
@@ -1649,4 +1648,3 @@ async def selectPlayerRankUnknown(
     set_cache(cache_key, xquery)
 
     return xquery
-
