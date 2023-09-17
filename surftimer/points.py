@@ -9,7 +9,7 @@ router = APIRouter()
 @router.get(
     "/surftimer/point_calc_finishedStages",
     name="Count Player Finished Stages",
-    tags=["strays", "Point Calculation"],
+    tags=["strays", "Points Calculation"],
 )
 def point_calc_finishedStages(
     request: Request,
@@ -50,7 +50,7 @@ def point_calc_finishedStages(
 @router.get(
     "/surftimer/point_calc_finishedMaps",
     name="Count Player Finished Maps",
-    tags=["strays", "Point Calculation"],
+    tags=["strays", "Points Calculation"],
 )
 def point_calc_finishedMaps(
     request: Request,

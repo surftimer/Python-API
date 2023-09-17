@@ -721,7 +721,7 @@ def deleteWipePlayerRank(
 @router.get(
     "/surftimer/point_calc_playerRankName",
     name="Select Player Name",
-    tags=["ck_playerrank", "strays", "Point Calculation"],
+    tags=["ck_playerrank", "strays", "Points Calculation"],
 )
 async def point_calc_playerRankName(
     request: Request,

@@ -62,7 +62,7 @@ tags_metadata = [
         "description": "All queries that were NOT contained in `queries.sp` for each table",
     },
     {
-        "name": "Point Calculation",
+        "name": "Points Calculation",
         "description": "Queries that are involved in **player points** calculation",
     },
     {

@@ -992,7 +992,7 @@ def pr_bonusInfo(
 @router.get(
     "/surftimer/point_calc_countFinishedBonus",
     name="Count Finished Player Finished Bonuses",
-    tags=["ck_bonus", "strays", "Point Calculation"],
+    tags=["ck_bonus", "strays", "Points Calculation"],
 )
 def point_calc_countFinishedBonus(
     request: Request,
