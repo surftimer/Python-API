@@ -127,6 +127,7 @@ async def updatePlayerRankPoints(
         data.steamid32,
         data.style,
     )
+
     xquery = insertQuery(sql)
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}

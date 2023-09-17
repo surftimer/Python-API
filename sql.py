@@ -38,7 +38,7 @@ def insertQuery(query):
     )
 
     mycursor = mydb.cursor()
-    mycursor.execute(query)
+    mycursor.execute("", (query))
 
     mydb.commit()
 
