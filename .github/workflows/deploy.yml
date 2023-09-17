@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Remove directories
+        run: rm -r .github .git
+
       - name: Upload files
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
