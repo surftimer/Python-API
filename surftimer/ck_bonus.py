@@ -800,9 +800,7 @@ def selectPersonalBonusStylesRecords(
         )
     )
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -887,11 +885,18 @@ def getRankSteamIdBonus(
         response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
         return response
 
-    xquery = selectQuery(
-        surftimer.queries.sql_stray_getRankSteamIdBonus.format(
-            mapname, zonegroup, limit
+    if zonegroup == 0:
+        xquery = selectQuery(
+            surftimer.queries.sql_stray_steamIdFromMapRank.format(
+                mapname, limit
+            )
         )
-    )
+    else:
+        xquery = selectQuery(
+            surftimer.queries.sql_stray_getRankSteamIdBonus.format(
+                mapname, zonegroup, limit
+            )
+        )
 
     if xquery:
         xquery = xquery.pop()
