@@ -171,9 +171,9 @@ async def selectPlayerTmp(
     if xquery:
         xquery = xquery.pop()
     else:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND, content=json.loads(cached_data)
-        )
+        response.headers['content-type'] = 'application/json'
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
