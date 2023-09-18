@@ -553,6 +553,7 @@ def viewBonusRunRank(
     style: int,
 ):
     """```char sql_stray_viewBonusRunRank[] = ....```\n
+    Returns the supposed rank for the data inputted\n
     Get count of rows with time faster than `runtime`, to get exact player bonus rank"""
     tic = time.perf_counter()
 
@@ -651,9 +652,7 @@ def selectPersonalBonusPrestrafeSpeeds(
         )
     )
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
