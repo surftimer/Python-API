@@ -69,6 +69,10 @@ tags_metadata = [
         "name": "Wipe",
         "description": "Wiping player related data",
     },
+    {
+        "name": "Refactored",
+        "description": "Queries that have been refactored or merged together"
+    }
 ]
 
 # Whitelisted IPs

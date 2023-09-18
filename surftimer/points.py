@@ -6,6 +6,7 @@ import surftimer.queries
 
 router = APIRouter()
 
+
 @router.get(
     "/surftimer/point_calc_finishedStages",
     name="Count Player Finished Stages",
@@ -88,3 +89,70 @@ def point_calc_finishedMaps(
     set_cache(cache_key, xquery)
 
     return xquery
+
+
+@router.get(
+    "/surftimer/recalculatePoints",
+    name="Points Recalculation",
+    tags=["Refactored", "Points Calculation"],
+)
+def recalculatePoints(
+    request: Request,
+    response: Response,
+    steamid32: str,
+    style: int,
+):
+    """Combines all the queries for point calculation into 1 endpoint"""
+    tic = time.perf_counter()
+
+    # Player Name for the selected Style
+    player_name_query = selectQuery(
+        surftimer.queries.sql_stray_point_calc_playerRankName.format(steamid32, style)
+    )
+    if len(player_name_query) <= 0:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+    else:
+        player_name_query = player_name_query.pop()
+        # name = str(player_name_query[0])
+
+    ## Bonuses
+    finished_bonuses_query = selectQuery(
+        surftimer.queries.sql_stray_point_calc_countFinishedBonus.format(
+            style, style, steamid32, style
+        )
+    )
+    if len(finished_bonuses_query) <= 0:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    ## Stages
+    finished_stages_query = selectQuery(
+        surftimer.queries.sql_stray_point_calc_finishedStages.format(steamid32, style)
+    )
+    if len(finished_stages_query) <= 0:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    ## Maps
+    finished_maps_query = selectQuery(
+        surftimer.queries.sql_stray_point_calc_finishedMaps.format(
+            style, style, steamid32, style
+        )
+    )
+    if len(finished_maps_query) <= 0:
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Create the JSON output
+    output = {
+        **player_name_query,  # Replace with your desired name
+        "maps": finished_maps_query,
+        "stages": finished_stages_query,
+        "bonuses": finished_bonuses_query,
+    }
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return output

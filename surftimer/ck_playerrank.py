@@ -1609,11 +1609,11 @@ async def selectPlayerRankUnknown(
 
 
 @router.get(
-    "/surftimer/selectPlayerRankUnknown",
+    "/surftimer/selectPlayerRankByName",
     name="Unknown Player Info - TO BE MERGED",
     tags=["ck_playerrank", "strays"],
 )
-async def selectPlayerRankUnknown(
+async def selectPlayerRankByName(
     request: Request,
     response: Response,
     style: int,
