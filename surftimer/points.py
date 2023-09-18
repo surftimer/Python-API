@@ -114,7 +114,6 @@ def recalculatePoints(
         return response
     else:
         player_name_query = player_name_query.pop()
-        # name = str(player_name_query[0])
 
     ## Bonuses
     finished_bonuses_query = selectQuery(
@@ -122,17 +121,11 @@ def recalculatePoints(
             style, style, steamid32, style
         )
     )
-    if len(finished_bonuses_query) <= 0:
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return response
 
     ## Stages
     finished_stages_query = selectQuery(
         surftimer.queries.sql_stray_point_calc_finishedStages.format(steamid32, style)
     )
-    if len(finished_stages_query) <= 0:
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return response
 
     ## Maps
     finished_maps_query = selectQuery(
@@ -140,9 +133,6 @@ def recalculatePoints(
             style, style, steamid32, style
         )
     )
-    if len(finished_maps_query) <= 0:
-        response.status_code = status.HTTP_204_NO_CONTENT
-        return response
 
     # Create the JSON output
     output = {
