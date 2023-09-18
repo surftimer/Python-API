@@ -15,7 +15,7 @@ class PlayerCheckpoints(BaseModel):
     mapname: str
     cp: int
     time: Decimal
-    stage_time: str
+    stage_time: Decimal
     stage_attempts: int
     zonegroup: int
 
@@ -407,7 +407,7 @@ async def ccp_getPlayerPR(
         return response
 
     xquery = selectQuery(
-        surftimer.queries.sql_stray_ccp_getPlayerPR.format(steamid32, mapname)
+        surftimer.queries.sql_stray_ccp_getPlayerPR.format(mapname, steamid32)
     )
 
     if len(xquery) > 0:
