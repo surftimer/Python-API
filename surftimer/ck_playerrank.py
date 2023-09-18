@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
-from sql import selectQuery, insertQuery
+from sql import selectQuery, insertQuery, insert_escaped_query
 from globals import get_cache, set_cache
 from pydantic import BaseModel
 import time, json
@@ -128,7 +128,7 @@ async def updatePlayerRankPoints(
         data.style,
     )
 
-    xquery = insertQuery(sql)
+    xquery = insert_escaped_query(sql)
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:
@@ -184,7 +184,7 @@ async def updatePlayerRankPoints2(
         data.steamid32,
         data.style,
     )
-    xquery = insertQuery(sql)
+    xquery = insert_escaped_query(sql)
 
     content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
     if xquery < 1:

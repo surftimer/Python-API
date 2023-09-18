@@ -38,6 +38,24 @@ def insertQuery(query):
     )
 
     mycursor = mydb.cursor()
+    mycursor.execute(query)
+
+    mydb.commit()
+
+    return mycursor.rowcount
+
+def insert_escaped_query(query):
+    """Executes `INSERT` query `mycursor.execute("", (query))` provided and returns `mycursor.rowcount`\n
+    Connects to a predefined `Database` from `config.json`"""
+    db = config["DATABASE"]
+    mydb = mysql.connector.connect(
+        host=db["HOST"],
+        user=db["USERNAME"],
+        password=db["PASSWORD"],
+        database=db["DB"]
+    )
+
+    mycursor = mydb.cursor()
     mycursor.execute("", (query))
 
     mydb.commit()
