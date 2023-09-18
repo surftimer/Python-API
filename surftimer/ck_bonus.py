@@ -704,9 +704,7 @@ def selectMapRankBonusStyle(
         )
     )
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
