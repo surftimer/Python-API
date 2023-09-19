@@ -967,11 +967,11 @@ async def getPlayerCountryRank(
 
 
 @router.get(
-    "/surftimer/getPlayerCountryRank",
-    name="Player Country Rank by Name",
+    "/surftimer/getPlayerCountryByName",
+    name="Player Country by Name",
     tags=["ck_playerrank", "strays"],
 )
-async def getPlayerCountryRank(
+async def getPlayerCountryByName(
     request: Request,
     response: Response,
     name: str,
@@ -980,7 +980,7 @@ async def getPlayerCountryRank(
     """`char[] sql_stray_countryRankPlayerCountryRankByName = ....`"""
     tic = time.perf_counter()
 
-    cache_key = f"getPlayerCountryRank:{name}-{style}"
+    cache_key = f"getPlayerCountry:{name}-{style}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
