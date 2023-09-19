@@ -1036,9 +1036,7 @@ async def countryTop(
 
     xquery = selectQuery(surftimer.queries.sql_stray_countryTop.format(country, style))
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -1078,9 +1076,7 @@ async def countryTopAllCountries(
         surftimer.queries.sql_stray_countryTopAllCountries.format(style)
     )
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -1300,9 +1296,7 @@ async def continentTop(
         surftimer.queries.sql_stray_continentTop.format(continentCode, style)
     )
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -1340,9 +1334,7 @@ async def continentNames(
 
     xquery = selectQuery(surftimer.queries.sql_stray_continentNames.format(style))
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -1383,9 +1375,7 @@ async def viewPlayerRank(
         surftimer.queries.sql_stray_viewPlayerRank.format(style, steamid32, style)
     )
 
-    if xquery:
-        xquery = xquery.pop()
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -1532,12 +1522,11 @@ async def rankCommandSelf(
     request: Request,
     response: Response,
     steamid32: str,
-    limit: int,
 ):
     """`char[] sql_stray_rankCommandSelf = ....`"""
     tic = time.perf_counter()
 
-    cache_key = f"rankCommandSelf:{steamid32}-{limit}"
+    cache_key = f"rankCommandSelf:{steamid32}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -1547,7 +1536,7 @@ async def rankCommandSelf(
         return response
 
     xquery = selectQuery(
-        surftimer.queries.sql_stray_rankCommandSelf.format(steamid32, limit)
+        surftimer.queries.sql_stray_rankCommandSelf.format(steamid32)
     )
 
     if xquery:
