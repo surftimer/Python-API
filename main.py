@@ -33,6 +33,10 @@ from surftimer.ck_playeroptions2 import router as ck_playeroptions2_router
 from surftimer.ck_bonus import router as ck_bonus_router
 from surftimer.ck_checkpoints import router as ck_checkpoints_router
 from surftimer.ck_playertemp import router as ck_playertemp_router
+from surftimer.ck_prinfo import router as ck_prinfo_router
+from surftimer.ck_replays import router as ck_replays_router
+from surftimer.ck_spawnlocations import router as ck_spawnlocations_router
+from surftimer.ck_zones import router as ck_zones_router
 from surftimer.points import router as points_calculation
 
 
@@ -87,6 +91,10 @@ app.include_router(ck_playeroptions2_router)
 app.include_router(ck_bonus_router)
 app.include_router(ck_checkpoints_router)
 app.include_router(ck_playertemp_router)
+app.include_router(ck_prinfo_router)
+app.include_router(ck_replays_router)
+app.include_router(ck_spawnlocations_router)
+app.include_router(ck_zones_router)
 app.include_router(points_calculation)
 
 

@@ -57,6 +57,26 @@ tags_metadata = [
         "name": "ck_playertemp",
         "description": "All queries concerning this table from `queries.sp`",
     },
+    # {
+    #     "name": "ck_playertimes",
+    #     "description": "All queries concerning this table from `queries.sp`",
+    # },
+    {
+        "name": "ck_prinfo",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_replays",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_spawnlocations",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
+    {
+        "name": "ck_zones",
+        "description": "All queries concerning this table from `queries.sp`",
+    },
     {
         "name": "strays",
         "description": "All queries that were NOT contained in `queries.sp` for each table",
@@ -71,8 +91,8 @@ tags_metadata = [
     },
     {
         "name": "Refactored",
-        "description": "Queries that have been refactored or merged together"
-    }
+        "description": "Queries that have been refactored or merged together",
+    },
 ]
 
 # Whitelisted IPs

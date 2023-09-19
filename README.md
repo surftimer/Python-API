@@ -26,13 +26,14 @@ Everyone is welcome to **PR** code if they want to help out. I cannot promise th
 - [x] ck_latestrecords
 - [x] ck_maptier
 - [x] ck_playeroptions2
-- [x] ck_playerrank - Partially
+- [x] ck_playerrank
 - [x] ck_playertemp - Partially
 - [ ] ck_playertimes
-- [ ] ck_spawnlocations
+- [x] ck_spawnlocations - ST Code
 - [ ] ck_vipadmins
 - [ ] ck_wrcps
-- [ ] ck_zones
-- [ ] ck_prinfo
-- [ ] ck_replays
+- [x] ck_zones - ST Code
+- [x] ck_prinfo - ST Code
+- [x] ck_replays - ST Code
 - [ ] check tables data type
+- [ ] ...? 
