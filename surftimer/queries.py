@@ -90,6 +90,8 @@ sql_selectPlayerRankUnknown = "SELECT `steamid`, `name`, `points` FROM `ck_playe
 sql_selectTopPlayers = "SELECT name, points, finishedmapspro, steamid FROM ck_playerrank WHERE style = {} ORDER BY points DESC LIMIT 100"
 sql_selectRankedPlayer = "SELECT steamid, name, points, finishedmapspro, country, lastseen, timealive, timespec, connections, readchangelog, style, countryCode, continentCode from ck_playerrank where steamid='{}';"
 sql_selectRankedPlayersRank = "SELECT name FROM ck_playerrank WHERE style = {} AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '{}' AND style = {}) ORDER BY points;"
+sql_selectPlayersStylesRank = "SELECT COUNT(steamid) FROM ck_playerrank WHERE style = {} AND points >= (SELECT points FROM ck_playerrank WHERE steamid = '{}' AND style = {}) ORDER BY points;"
+
 sql_selectRankedPlayers = "SELECT steamid, name from ck_playerrank where points > 0 AND style = 0 ORDER BY points DESC LIMIT 0, 1067;"
 sql_CountRankedPlayers = "SELECT COUNT(steamid) FROM ck_playerrank WHERE style = {};"
 sql_CountRankedPlayers2 = (

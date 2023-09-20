@@ -98,6 +98,19 @@ tags_metadata = [
 # Whitelisted IPs
 WHITELISTED_IPS = config["WHITELISTED_IPS"]
 
+# All styles
+# 0 = normal, 1 = SW, 2 = HSW, 3 = BW, 4 = Low-Gravity, 5 = Slow Motion, 6 = Fast Forward, 7 = Freestyle
+all_styles = [
+    "Normal",
+    "Sideways",
+    "Half-Sideways",
+    "Backwards",
+    "Low-Gravity",
+    "Slow Motion",
+    "Fast Forward",
+    "Freestyle",
+]
+
 
 def append_request_log(request: Request):
     """Logs some general info about the request recieved in `requests.json`"""

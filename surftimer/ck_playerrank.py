@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery, insert_escaped_query
-from globals import get_cache, set_cache
+from globals import get_cache, set_cache, all_styles
 from pydantic import BaseModel
 import time, json
 import surftimer.queries
@@ -404,6 +404,49 @@ async def selectRankedPlayersRank(
     set_cache(cache_key, xquery)
 
     return xquery
+
+
+@router.get(
+    "/surftimer/selectRankedPlayerRankAllStyles",
+    name="Player rank for all styles",
+    tags=["ck_playerrank", "Refactored"],
+)
+async def selectRankedPlayerRankAllStyles(
+    request: Request,
+    response: Response,
+    steamid32: str,
+):
+    """`char[] sql_selectRankedPlayersRank = ....`\n
+    Get all styles player rank in 1 go"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectRankedPlayerRankAllStyles:{steamid32}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    output = []
+
+    i = 0
+    for style in all_styles:
+        xquery = selectQuery(
+            surftimer.queries.sql_selectPlayersStylesRank.format(i, steamid32, i)
+        )
+        output.append({"style": style,"rank": xquery.pop()["COUNT(steamid)"]})
+        i = i + 1
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+    # Cache the data in Redis
+    set_cache(cache_key, output)
+
+    return output
 
 
 @router.get(
@@ -1535,9 +1578,7 @@ async def rankCommandSelf(
         response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
         return response
 
-    xquery = selectQuery(
-        surftimer.queries.sql_stray_rankCommandSelf.format(steamid32)
-    )
+    xquery = selectQuery(surftimer.queries.sql_stray_rankCommandSelf.format(steamid32))
 
     if xquery:
         xquery = xquery.pop()
