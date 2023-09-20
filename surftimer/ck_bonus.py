@@ -192,6 +192,62 @@ def selectPersonalBonusRecords(
 
 
 @router.get(
+    "/surftimer/selectPersonalBonusesMap",
+    name="Get Player Bonus info for map",
+    tags=["ck_bonus", "Refactored"],
+)
+def selectPersonalBonusesMap(
+    request: Request, response: Response, steamid32: str, mapname: str
+):
+    """merge ```char sql_selectPersonalBonusRecords[] = ....```\n
+    and\n
+    ```char sql_selectPlayerRankBonus[] = ....```\n
+    and maybe more to output a single object with Bonus information for player"""
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectPersonalBonusesMap:{steamid32}-{mapname}"
+    cached_data = get_cache(cache_key)
+
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_selectPersonalBonusRecords.format(steamid32, mapname)
+    )
+
+    if len(xquery) <= 0:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    for completion in xquery:
+        zonegroup = completion["zonegroup"]
+        rank_query = selectQuery(
+            surftimer.queries.sql_selectPlayerRankBonusCount.format(
+                steamid32,
+                mapname,
+                zonegroup,
+                mapname,
+                zonegroup,
+            )
+        )
+        completion["rank"] = rank_query.pop()["COUNT(steamid)"]
+
+    toc = time.perf_counter()
+    print(f"Execution time {toc - tic:0.4f}")
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    return xquery
+
+
+@router.get(
     "/surftimer/selectPlayerRankBonus",
     name="Get Player Rank Bonus",
     tags=["ck_bonus"],
@@ -887,9 +943,7 @@ def getRankSteamIdBonus(
 
     if zonegroup == 0:
         xquery = selectQuery(
-            surftimer.queries.sql_stray_steamIdFromMapRank.format(
-                mapname, limit
-            )
+            surftimer.queries.sql_stray_steamIdFromMapRank.format(mapname, limit)
         )
     else:
         xquery = selectQuery(

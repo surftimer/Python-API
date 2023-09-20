@@ -38,6 +38,7 @@ from surftimer.ck_replays import router as ck_replays_router
 from surftimer.ck_spawnlocations import router as ck_spawnlocations_router
 from surftimer.ck_zones import router as ck_zones_router
 from surftimer.points import router as points_calculation
+from surftimer.refactored import router as refactored_router
 
 
 class IPValidatorMiddleware(BaseHTTPMiddleware):
@@ -96,6 +97,7 @@ app.include_router(ck_replays_router)
 app.include_router(ck_spawnlocations_router)
 app.include_router(ck_zones_router)
 app.include_router(points_calculation)
+app.include_router(refactored_router)
 
 
 @app.get("/docs2", include_in_schema=False)

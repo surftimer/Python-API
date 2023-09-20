@@ -10,8 +10,9 @@ sql_createBonusIndex = (
 sql_insertBonus = "INSERT INTO ck_bonus (steamid, name, mapname, runtime, zonegroup, velStartXY, velStartXYZ, velStartZ) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')"
 sql_updateBonus = "UPDATE ck_bonus SET runtime = '{}', name = '{}', velStartXY = {}, velStartXYZ = {}, velStartZ = {} WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {} AND style = 0"
 sql_selectBonusCount = "SELECT zonegroup, style, count(1) FROM ck_bonus WHERE mapname = '{}' GROUP BY zonegroup, style;"
-sql_selectPersonalBonusRecords = "SELECT runtime, zonegroup, style FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0'"
+sql_selectPersonalBonusRecords = "SELECT runtime, zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0'"
 sql_selectPlayerRankBonus = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND runtime > 0.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
+sql_selectPlayerRankBonusCount = "SELECT COUNT(steamid) FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND runtime > 0.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
 sql_selectFastestBonus = "SELECT t1.name, t1.runtime, t1.zonegroup, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ from ck_bonus t1 where t1.mapname = '{}' and t1.runtime = (select min(t2.runtime) from ck_bonus t2 where t2.mapname = t1.mapname and t2.zonegroup = t1.zonegroup and t2.style = t1.style);"
 sql_deleteBonus = "DELETE FROM ck_bonus WHERE mapname = '{}'"
 sql_selectAllBonusTimesinMap = (
@@ -25,7 +26,7 @@ sql_stray_viewBonusRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapnam
 sql_stray_deleteSpecificBonus = (
     "DELETE FROM ck_bonus WHERE zonegroup = {} AND mapname = '{}';"
 )
-sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';"
+sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';" # merged with sql_selectPersonalBonusRecords
 sql_stray_selectMapRankBonusStyle = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND style = {} AND runtime > 0.0 AND zonegroup = {}) AND mapname = '{}' AND style = {} AND zonegroup = {};"
 sql_stray_viewBonusStyleRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = '{}' AND style = '{}' AND runtime < {}"
 sql_stray_selectPersonalBonusStylesRecords = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND style = '{}' AND runtime > '0.0'"

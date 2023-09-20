@@ -1,8 +1,8 @@
 import mysql.connector
-import json
+import simplejson as json
 
 
-with open('config.json', 'r') as f:
+with open("config.json", "r") as f:
     config = json.load(f)
 
 
@@ -15,16 +15,17 @@ def selectQuery(query):
         host=db["HOST"],
         user=db["USERNAME"],
         password=db["PASSWORD"],
-        database=db["DB"]
+        database=db["DB"],
     )
     mycursor = mydb.cursor(dictionary=True)
     mycursor.execute(query)
     res = mycursor.fetchall()
     for result in res:
         json_data.append(dict(result))
-    
+
     mydb.close()
     return json_data
+
 
 def insertQuery(query):
     """Executes `INSERT` query provided and returns `mycursor.rowcount`\n
@@ -34,7 +35,7 @@ def insertQuery(query):
         host=db["HOST"],
         user=db["USERNAME"],
         password=db["PASSWORD"],
-        database=db["DB"]
+        database=db["DB"],
     )
 
     mycursor = mydb.cursor()
@@ -44,6 +45,7 @@ def insertQuery(query):
 
     return mycursor.rowcount
 
+
 def insert_escaped_query(query):
     """Executes `INSERT` query `mycursor.execute("", (query))` provided and returns `mycursor.rowcount`\n
     Connects to a predefined `Database` from `config.json`"""
@@ -52,7 +54,7 @@ def insert_escaped_query(query):
         host=db["HOST"],
         user=db["USERNAME"],
         password=db["PASSWORD"],
-        database=db["DB"]
+        database=db["DB"],
     )
 
     mycursor = mydb.cursor()
@@ -61,6 +63,7 @@ def insert_escaped_query(query):
     mydb.commit()
 
     return mycursor.rowcount
+
 
 def syncQuery(query):
     db = config["DATABASE"]

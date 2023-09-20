@@ -91,10 +91,7 @@ async def selectCheckpoints(
         surftimer.queries.sql_selectCheckpoints.format(mapname, steamid32)
     )
 
-    if len(xquery) > 0:
-        # xquery = xquery.pop()
-        print("Hit, length:", len(xquery))
-    else:
+    if len(xquery) <= 0:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
