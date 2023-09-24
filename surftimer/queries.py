@@ -9,11 +9,11 @@ sql_createBonusIndex = (
 )
 sql_insertBonus = "INSERT INTO ck_bonus (steamid, name, mapname, runtime, zonegroup, velStartXY, velStartXYZ, velStartZ) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')"
 sql_updateBonus = "UPDATE ck_bonus SET runtime = '{}', name = '{}', velStartXY = {}, velStartXYZ = {}, velStartZ = {} WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {} AND style = 0"
-sql_selectBonusCount = "SELECT zonegroup, style, count(1) FROM ck_bonus WHERE mapname = '{}' GROUP BY zonegroup, style;"
+sql_selectBonusCount = "SELECT zonegroup, style, count(1) FROM ck_bonus WHERE mapname = '{}' GROUP BY zonegroup, style;" # merged with sql_selectBonusData
 sql_selectPersonalBonusRecords = "SELECT runtime, zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0'"
 sql_selectPlayerRankBonus = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND runtime > 0.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
 sql_selectPlayerRankBonusCount = "SELECT COUNT(steamid) FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND runtime > 0.0 AND zonegroup = {} AND style = 0) AND mapname = '{}' AND zonegroup = {} AND style = 0;"
-sql_selectFastestBonus = "SELECT t1.name, t1.runtime, t1.zonegroup, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ from ck_bonus t1 where t1.mapname = '{}' and t1.runtime = (select min(t2.runtime) from ck_bonus t2 where t2.mapname = t1.mapname and t2.zonegroup = t1.zonegroup and t2.style = t1.style);"
+sql_selectFastestBonus = "SELECT t1.name, t1.runtime, t1.zonegroup, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ from ck_bonus t1 where t1.mapname = '{}' and t1.runtime = (select min(t2.runtime) from ck_bonus t2 where t2.mapname = t1.mapname and t2.zonegroup = t1.zonegroup and t2.style = t1.style);" # merged with sql_selectBonusData
 sql_deleteBonus = "DELETE FROM ck_bonus WHERE mapname = '{}'"
 sql_selectAllBonusTimesinMap = (
     "SELECT zonegroup, runtime from ck_bonus WHERE mapname = '{}';"
@@ -26,7 +26,7 @@ sql_stray_viewBonusRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapnam
 sql_stray_deleteSpecificBonus = (
     "DELETE FROM ck_bonus WHERE zonegroup = {} AND mapname = '{}';"
 )
-sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';" # merged with sql_selectPersonalBonusRecords
+sql_stray_selectPersonalBonusPrestrafeSpeeds = "SELECT zonegroup, style, velStartXY, velStartXYZ, velStartZ FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND runtime > '0.0';"  # merged with sql_selectPersonalBonusRecords
 sql_stray_selectMapRankBonusStyle = "SELECT name FROM ck_bonus WHERE runtime <= (SELECT runtime FROM ck_bonus WHERE steamid = '{}' AND mapname= '{}' AND style = {} AND runtime > 0.0 AND zonegroup = {}) AND mapname = '{}' AND style = {} AND zonegroup = {};"
 sql_stray_viewBonusStyleRunRank = "SELECT count(runtime)+1 FROM ck_bonus WHERE mapname = '{}' AND zonegroup = '{}' AND style = '{}' AND runtime < {}"
 sql_stray_selectPersonalBonusStylesRecords = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND style = '{}' AND runtime > '0.0'"
@@ -34,6 +34,8 @@ sql_stray_viewPRinfoMapRankBonusCallback = "SELECT COUNT(*), steamid FROM ck_bon
 sql_stray_getRankSteamIdBonus = "SELECT steamid FROM ck_bonus WHERE mapname = '{}' AND style = 0 AND runtime > -1.0 AND zonegroup = '{}' ORDER BY runtime ASC LIMIT {}, 1;"
 sql_stray_deleteWipePlayerBonus = "DELETE FROM ck_bonus WHERE steamid = '{}';"
 sql_stray_pr_bonusInfo = "SELECT runtime, zonegroup FROM ck_bonus WHERE steamid = '{}' AND mapname = '{}' AND zonegroup = {};"
+sql_selectBonusData = "SELECT t1.name, t1.runtime, t1.zonegroup, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ, (SELECT COUNT(*) FROM ck_bonus t2 WHERE t2.mapname = '{}' AND t2.zonegroup = t1.zonegroup AND t2.style = t1.style) AS total FROM ck_bonus t1 WHERE t1.mapname = '{}' AND t1.runtime = (SELECT MIN(t2.runtime) FROM ck_bonus t2 WHERE t2.mapname = t1.mapname AND t2.zonegroup = t1.zonegroup AND t2.style = t1.style);" # merges sql_selectBonusCount and sql_selectFastestBonus
+
 
 ## ck_checkpoints
 sql_createCheckpoints = "CREATE TABLE IF NOT EXISTS ck_checkpoints (steamid VARCHAR(32), mapname VARCHAR(32), cp INT(11) NOT NULL, time decimal(12,6) NOT NULL DEFAULT '-1.000000', zonegroup INT(12) NOT NULL DEFAULT 0, PRIMARY KEY(steamid, mapname, cp, zonegroup)) DEFAULT CHARSET=utf8mb4;"
@@ -42,10 +44,10 @@ sql_selectCheckpoints = "SELECT zonegroup, cp, time FROM ck_checkpoints WHERE ma
 sql_selectCheckpointsinZoneGroup = "SELECT cp, time FROM ck_checkpoints WHERE mapname='{}' AND steamid = '{}' AND zonegroup = {};"
 sql_selectRecordCheckpoints = "SELECT zonegroup, cp, `time` FROM ck_checkpoints WHERE steamid = '{}' AND mapname='{}' UNION SELECT a.zonegroup, b.cp, b.time FROM ck_bonus a LEFT JOIN ck_checkpoints b ON a.steamid = b.steamid AND a.zonegroup = b.zonegroup WHERE a.mapname = '{}' GROUP BY a.zonegroup;"
 sql_deleteCheckpoints = "DELETE FROM ck_checkpoints WHERE mapname = '{}'"
-sql_selectStageTimes = (
-    "SELECT cp, stage_time FROM ck_checkpoints WHERE mapname = '{}' AND steamid = '{}';"
-)
-sql_selectStageAttempts = "SELECT cp, stage_attempts FROM ck_checkpoints WHERE mapname = '{}' AND steamid = '{}';"
+sql_selectStageTimes = "SELECT cp, stage_time, stage_attempts, zonegroup FROM ck_checkpoints WHERE mapname = '{}' AND steamid = '{}' AND zonegroup = 0;"
+sql_selectStageAttempts = "SELECT cp, stage_attempts FROM ck_checkpoints WHERE mapname = '{}' AND steamid = '{}';"  # merged with sql_selectStageTimes
+sql_selectCheckpointsData = "SELECT cp, time, stage_time, stage_attempts, zonegroup FROM ck_checkpoints WHERE mapname = '{}' AND steamid = '{}';"
+
 
 ## ck_latestrecords
 sql_createLatestRecords = "CREATE TABLE IF NOT EXISTS ck_latestrecords (steamid VARCHAR(32), name VARCHAR(64), runtime decimal(12,6) NOT NULL DEFAULT '-1.000000', map VARCHAR(32), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(steamid,map,date)) DEFAULT CHARSET=utf8mb4;"
@@ -178,19 +180,18 @@ sql_updateRecordPro = "UPDATE ck_playertimes SET name = '{}', runtimepro = '{}',
 sql_selectPlayer = (
     "SELECT steamid FROM ck_playertimes WHERE steamid = '{}' AND mapname = '{}';"
 )
-sql_selectMapRecord = "SELECT t1.runtimepro, t1.name, t1.steamid, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ FROM ck_playertimes t1 JOIN ( SELECT MIN(runtimepro) AS min_runtime, style, mapname FROM ck_playertimes GROUP BY mapname, style ) AS t2 ON t1.runtimepro = t2.min_runtime AND t1.mapname = t2.mapname AND t1.style = t2.style WHERE t1.mapname = '{}'"
+sql_selectMapRecord = "SELECT t1.runtimepro, t1.name, t1.steamid, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ FROM ck_playertimes t1 JOIN ( SELECT MIN(runtimepro) AS min_runtime, style, mapname FROM ck_playertimes GROUP BY mapname, style ) AS t2 ON t1.runtimepro = t2.min_runtime AND t1.mapname = t2.mapname AND t1.style = t2.style WHERE t1.mapname = '{}'"  # merged with sql_selectMapRecordsNew
 sql_selectPersonalAllRecords = "SELECT db1.name, db2.steamid, db2.mapname, db2.runtimepro as overall, db1.steamid, db3.tier FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid INNER JOIN ck_maptier AS db3 ON db2.mapname = db3.mapname WHERE db2.steamid = '{}' AND db2.style = {} AND db1.style = {} AND db2.runtimepro > -1.0 ORDER BY mapname ASC;"
 sql_selectTopSurfers = "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '{}' AND db1.style = {} AND db2.style = {} AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 50;"
 sql_selectTopSurfers2 = "SELECT db2.steamid, db1.name, db2.runtimepro as overall, db1.steamid, db2.mapname FROM ck_playertimes as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname = '{}' AND db1.style = 0 AND db2.style = 0 AND db2.runtimepro > -1.0 ORDER BY overall ASC LIMIT 100;"
-sql_selectPlayerProCount = (
-    "SELECT style, count(1) FROM ck_playertimes WHERE mapname = '{}' GROUP BY style;"
-)
+sql_selectPlayerProCount = "SELECT style, count(1) AS total FROM ck_playertimes WHERE mapname = '{}' GROUP BY style;"  # merged with sql_selectMapRecordsNew
 sql_selectPlayerRankProTime = "SELECT COUNT(*) FROM ck_playertimes WHERE runtimepro <= (SELECT runtimepro FROM ck_playertimes WHERE steamid = '{}' AND mapname = '{}' AND style = 0 AND runtimepro > -1.0) AND mapname = '{}' AND style = 0 AND runtimepro > -1.0;"
 sql_selectAllMapTimesinMap = (
     "SELECT runtimepro from ck_playertimes WHERE mapname = '{}';"
 )
 sql_stray_steamIdFromMapRank = "SELECT steamid FROM ck_playertimes WHERE mapname = '{}' AND style = 0 AND runtimepro > -1.0 ORDER BY runtimepro ASC LIMIT {}, 1;"
 sql_selectMapRankUnknownWithMap = "SELECT `steamid`, `name`, `mapname`, `runtimepro` FROM `ck_playertimes` WHERE `mapname` = '{}' AND style = 0 ORDER BY `runtimepro` ASC LIMIT {}, 1;"
+sql_selectMapRecordsNew = """SELECT t1.runtimepro, t1.name, t1.steamid, t1.style, t1.velStartXY, t1.velStartXYZ, t1.velstartZ, (SELECT COUNT(*) FROM ck_playertimes t2 WHERE t2.mapname = '{}' AND t2.style = t1.style) AS total FROM ck_playertimes t1 WHERE t1.mapname = '{}' AND t1.runtimepro = (SELECT MIN(runtimepro) FROM ck_playertimes t3 WHERE t3.mapname = t1.mapname AND t3.style = t1.style);"""
 
 ## ck_spawnlocations
 sql_createSpawnLocations = "CREATE TABLE IF NOT EXISTS ck_spawnlocations (mapname VARCHAR(54) NOT NULL, pos_x FLOAT NOT NULL, pos_y FLOAT NOT NULL, pos_z FLOAT NOT NULL, ang_x FLOAT NOT NULL, ang_y FLOAT NOT NULL, ang_z FLOAT NOT NULL,  `vel_x` float NOT NULL DEFAULT '0', `vel_y` float NOT NULL DEFAULT '0', `vel_z` float NOT NULL DEFAULT '0', zonegroup INT(12) DEFAULT 0, stage INT(12) DEFAULT 0, teleside INT(11) DEFAULT 0, PRIMARY KEY(mapname, zonegroup, stage, teleside)) DEFAULT CHARSET=utf8mb4;"
